@@ -27,7 +27,7 @@ print(Character())
 # }
 #
 
-print(Character().query())
+print(Character.query())
 # {
 #     appearsIn {
 #         name
@@ -36,12 +36,12 @@ print(Character().query())
 #     name
 # } 
 
-print(Character().query("name"))
+print(Character.query("name"))
 # {
 #     name
 # } 
 
-print(Character().query(indent=2)) # Default indent is 4
+print(Character.query(indent=2)) # Default indent is 4
 # {
 #   appearsIn {
 #     name

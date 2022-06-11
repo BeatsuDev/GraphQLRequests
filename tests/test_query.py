@@ -18,12 +18,10 @@ class ListedType(GraphQLType):
     id = ID
     names = [String]
     types = [EveryType]
-    
-print(EveryType().query())
 
 
 def test_primitive_types():
-    assert EveryType().query() == """
+    assert EveryType.query() == """
 {
     age
     company
@@ -34,7 +32,7 @@ def test_primitive_types():
 """[1:-1]
 
 def test_indent():
-    assert EveryType().query(indent=2) == """
+    assert EveryType.query(indent=2) == """
 {
   age
   company
@@ -45,7 +43,7 @@ def test_indent():
 """[1:-1]
 
 def test_query_selection():
-    assert EveryType().query("id", "age") == """
+    assert EveryType.query("id", "age") == """
 {
     age
     id
@@ -53,7 +51,7 @@ def test_query_selection():
 """[1:-1]
     
 def test_nested_types():
-    assert NestedType().query() == """
+    assert NestedType.query() == """
 {
     age
     id
@@ -68,7 +66,7 @@ def test_nested_types():
 """[1:-1]
     
 def test_listed_types():
-    assert ListedType().query() == """
+    assert ListedType.query() == """
 {
     id
     names
