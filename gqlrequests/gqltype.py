@@ -1,16 +1,29 @@
 from gqlrequests.primitives import GraphQLPrimitive
 
 def get_type(v):
-    """Recursive function to get the GraphQL type of a value"""
+    """Get the GraphQL type of a variable.
+    
+    Example:
+    
+    class MyGraphQLType(GraphQLType):
+        something = [Int]
+        
+    >>> get_type(MyGraphQLType.something)
+    Int
+    """
+    # If the value is a list, we need to get the type of the first element
     if isinstance(v, list):
-        if len(v) == 0:
-            return list.__name__
-        value = "[" + get_type(v[0]) + "]" 
-    elif type(v) == type or type(v) == GraphQLType:
-        value = v.__name__
-    else:
-        value = type(v).__name__
-    return value
+        # If the list is empty, return []
+        if len(v) == 0: return "[]"
+        # Otherwise, return the type of the first element
+        return "[" + get_type(v[0]) + "]" 
+
+    # If the value is a GraphQLType, return the class name. If the value is an uninitialized
+    # class, also return the class name.
+    if type(v) == type or type(v) == GraphQLType:
+        return v.__name__
+
+    return type(v).__name__
 
 class GraphQLType:
     def __str__(self):
