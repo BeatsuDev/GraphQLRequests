@@ -45,11 +45,12 @@ class GraphQLType:
         return output_string + "}"
 
     @classmethod
-    def query(cls, *args, indent=4, recursion_depth=1):
+    def query(cls, *args, indent=4, strip_underscores=False, recursion_depth=1):
         """A recursive method that returns the GraphQL type the way it would be queried for.
         
         :args *str: The fields of the type to include in the query.
         :indent int: The amount of spaces for each indent step
+        :strip_underscores bool: Whether to strip underscores of attributes or not (this is to support name collisions in Python)
         :recursion_depth int: The depth in the recursion at which this
             method is called (used to track indentation spaces necessary)
         """
@@ -59,7 +60,7 @@ class GraphQLType:
         attributes = [a for a in attributes_before_filter if a in args] if len(args) > 0 else attributes_before_filter
         values = [getattr(cls, a) for a in attributes]
 
-        items = zip(attributes, values)
+        items = zip([(a.strip("_") if strip_underscores else a) for a in attributes], values)
         
         # Build the output string
         output_string = "{\n"
@@ -72,13 +73,13 @@ class GraphQLType:
                     output_string += "\n"
                     continue
 
-                output_string += " " + v[0].query(indent=indent, recursion_depth=recursion_depth+1)
+                output_string += " " + v[0].query(indent=indent, strip_underscores=strip_underscores, recursion_depth=recursion_depth+1)
                 continue
 
             if issubclass(v, GraphQLPrimitive):
                 output_string += "\n"
                 continue
 
-            output_string += " " + v.query(indent=indent, recursion_depth=recursion_depth+1)
+            output_string += " " + v.query(indent=indent, strip_underscores=strip_underscores, recursion_depth=recursion_depth+1)
 
         return output_string + " "*(indent*(recursion_depth-1)) + ("}\n" if recursion_depth > 1 else "}")
