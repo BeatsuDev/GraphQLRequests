@@ -11,11 +11,11 @@ class Query:
     def __init__(
         self,
         dataclass_schema: DataclassType,
-        fields: list[str | Query | QueryMethod] = [],
+        fields: list[str | Query | QueryMethod] | None = None,
         indent: int = 4,
     ):
         self.dataclass_schema = dataclass_schema
-        self.fields = fields
+        self.fields = fields or []
         self.indent = indent
 
     def __str__(self) -> str:
