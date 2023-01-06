@@ -1,8 +1,9 @@
-# gqlrequests - A Python library for creating GraphQL query easier!
-Define GraphQL types in Python, then use them to build queries super easy. Supports dataclasses and
-graphql-core schemas too! Example of how it will work:
+# gqlrequests - A Python library for creating GraphQL queries easier!
+Define GraphQL types in Python as dataclasses, then use them to automatically build queries! 
 
-**Note that these examples are the end goal and very few features have been developed yet!**
+**Note that these examples show what the end goal is, and that very few of these features have been developed yet!**
+
+Examples of how it will work:
 ```py
 from dataclasses import dataclass
 import gqlrequests
