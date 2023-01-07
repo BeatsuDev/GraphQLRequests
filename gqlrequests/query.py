@@ -74,7 +74,7 @@ class Query:
                 field_string = (
                     field
                     + " "
-                    + Query(field_type)._generate_query(self.indents + indents)
+                    + str(Query(field_type, indents=self.indents, start_indent=indents))
                 )
 
             # If the field is a list containing a dataclass, generate a new query for the first dataclass in the list
@@ -85,8 +85,12 @@ class Query:
                     field_string = (
                         field
                         + " "
-                        + Query(field_type.__args__[0])._generate_query(
-                            indents + self.indents
+                        + str(
+                            Query(
+                                field_type.__args__[0],
+                                indents=self.indents,
+                                start_indent=indents,
+                            )
                         )
                     )
 
