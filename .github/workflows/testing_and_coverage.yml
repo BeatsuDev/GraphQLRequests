@@ -1,7 +1,13 @@
 # Run pytests and generate coverage
 name: Pytests and Coverage
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   pytests:
@@ -32,7 +38,7 @@ jobs:
   
   coverage:
     runs-on: ubuntu-latest
-    requires: [pytests]
+    needs: [pytests]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
