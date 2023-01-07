@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import typing
+from keyword import iskeyword
 from typing import List, Optional
 
 from typing_inspect import is_generic_type  # type: ignore
@@ -17,10 +18,12 @@ class Query:
         dataclass_schema: DataclassType,
         fields: Optional[List[str | DataclassType | QueryMethod]] = None,
         indents: int = 4,
+        strip_underscores_for_keywords: bool = True,
     ):
         self.dataclass_schema = dataclass_schema
         self.fields = fields
         self.indents = indents
+        self.strip = strip_underscores_for_keywords
 
     def _generate_fields(
         self,
@@ -39,7 +42,9 @@ class Query:
         # Only include the fields of the dataclass that are in the fields list
         included_fields = fields or field_names
         resolved_field_types = {
-            name: resolved_hints[name]
+            (name.strip("_") if iskeyword(name.strip("_")) else name): resolved_hints[
+                name
+            ]
             for name in field_names
             if name in included_fields
         }

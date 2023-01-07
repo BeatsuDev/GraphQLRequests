@@ -38,6 +38,13 @@ class InvalidType:
     invalidProperty: SomeClass
 
 
+@dataclass
+class DatatypeWithKeywordAsProperty:
+    type: str  # This is okay, because type is a reserved *function*, not keyword
+    from_: str
+    as_: int
+
+
 def test_primitive_types():
     assert str(Query(EveryType)) == """
 {
@@ -109,3 +116,12 @@ def test_invalid_type_throws_value_error():
     # Ensure the error message contains the name of the invalid property 
     # and the name of the class - this is to help the user debug the issue
     assert "invalidProperty" in str(e.value) and "InvalidType" in str(e.value)
+
+def test_keyword_as_property_gets_stripped_for_underscores():
+    assert str(Query(DatatypeWithKeywordAsProperty)) == """
+{
+    type
+    from
+    as
+}
+"""[1:-1]
