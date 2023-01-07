@@ -1,81 +1,92 @@
-from gqlrequests import GraphQLType
-from gqlrequests.primitives import *
+from dataclasses import dataclass
+from typing import List
+
+from gqlrequests.query import Query
 
 
-class EveryType(GraphQLType):
-    id = ID
-    age = Int 
-    money = Float
-    name = String
-    company = Boolean
+@dataclass
+class EveryType:
+    id: int
+    age: int
+    money: float
+    name: str
+    company: bool
 
-class NestedType(GraphQLType):
-    id = ID
-    age = Int
-    something = EveryType
 
-class ListedType(GraphQLType):
-    id = ID
-    names = [String]
-    types = [EveryType]
+@dataclass
+class NestedType:
+    id: int
+    age: int
+    something: EveryType
+
+
+@dataclass
+class ListedType:
+    id: int
+    names: List[str]
+    types: List[EveryType]
 
 
 def test_primitive_types():
-    assert EveryType.query() == """
+    assert str(Query(EveryType)) == """
 {
-    age
-    company
     id
+    age
     money
     name
+    company
 }
 """[1:-1]
+
 
 def test_indent():
-    assert EveryType.query(indent=2) == """
+    assert str(Query(EveryType, indents=2)) == """
 {
-  age
-  company
   id
+  age
   money
   name
+  company
 }
 """[1:-1]
 
+
 def test_query_selection():
-    assert EveryType.query("id", "age") == """
+    assert str(Query(EveryType, fields=["id", "age"])) == """
 {
-    age
     id
+    age
 }
 """[1:-1]
-    
+
+
 def test_nested_types():
-    assert NestedType.query() == """
+    assert str(Query(NestedType)) == """
 {
-    age
     id
-    something {
-        age
-        company
+    age
+    {
         id
+        age
         money
         name
+        company
     }
 }
 """[1:-1]
-    
+
+
 def test_listed_types():
-    assert ListedType.query() == """
+    assert str(Query(ListedType)) == """
 {
     id
     names
     types {
-        age
-        company
         id
+        age
         money
         name
+        company
     }
 }
 """[1:-1]
