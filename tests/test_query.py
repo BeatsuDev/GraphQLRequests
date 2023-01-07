@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 
+import pytest
+
 from gqlrequests.query import Query
 
 
@@ -25,6 +27,15 @@ class ListedType:
     id: int
     names: List[str]
     types: List[EveryType]
+
+
+class SomeClass:
+    pass
+
+
+@dataclass
+class InvalidType:
+    invalidProperty: SomeClass
 
 
 def test_primitive_types():
@@ -90,3 +101,11 @@ def test_listed_types():
     }
 }
 """[1:-1]
+
+def test_invalid_type_throws_value_error():
+    with pytest.raises(ValueError) as e:
+        str(Query(InvalidType))
+    
+    # Ensure the error message contains the name of the invalid property 
+    # and the name of the class - this is to help the user debug the issue
+    assert "invalidProperty" in str(e.value) and "InvalidType" in str(e.value)
