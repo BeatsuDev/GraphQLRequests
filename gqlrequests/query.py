@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import dataclasses
 import typing
-from typing_inspect import is_generic_type
+
+from typing_inspect import is_generic_type  # type: ignore
 
 if typing.TYPE_CHECKING:
     from gqlrequests.query_method import QueryMethod
@@ -43,16 +44,20 @@ class Query:
             if name in included_fields
         }
 
+        def is_list(f):
+            return is_generic_type(f) and f.__origin__ == list
+
+        def is_primitive(f):
+            return hasattr(f, "__name__") and f.__name__ in [
+                "str",
+                "int",
+                "float",
+                "bool",
+            ]
+
         # Build the fields string
         formatted_fields = []
         for field, field_type in resolved_field_types.items():
-            is_list = (
-                lambda f: is_generic_type(f)
-                and f.__origin__ == list  # noqa: E731
-            )
-            is_primitive = lambda f: hasattr(f, "__name__") and f.__name__ in ["str", "int", "float", "bool"]  # noqa: E731
-
-            print(field_type, is_list(field_type), is_primitive(field_type))
 
             # If the field is a dataclass, generate a new query for it
             if dataclasses.is_dataclass(field_type):

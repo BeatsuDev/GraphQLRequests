@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 from gqlrequests.query import Query
 
@@ -22,8 +23,8 @@ class NestedType:
 @dataclass
 class ListedType:
     id: int
-    names: list[str]
-    types: list[EveryType]
+    names: List[str]
+    types: List[EveryType]
 
 
 def test_primitive_types():
