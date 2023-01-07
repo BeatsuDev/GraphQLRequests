@@ -3,5 +3,6 @@ exclude_lines =
     pragma: no cover
     if TYPE_CHECKING:
 
-ignore:
-    - "gqlrequests/custom_type_hints.py"
+[run]
+omit =
+    gqlrequests/custom_type_hints.py
