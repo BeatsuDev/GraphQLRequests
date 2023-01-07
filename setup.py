@@ -13,7 +13,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=["gqlrequests"],
-    install_requires=[],
+    install_requires=["typing_inspect~=0.8.0"],
     license="MIT",
     version=__version__,
     description="A Python library for making GraphQL requests easier!",

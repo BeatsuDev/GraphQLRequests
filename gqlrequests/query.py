@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import typing
-from types import GenericAlias
+from typing_inspect import is_generic_type
 
 if typing.TYPE_CHECKING:
     from gqlrequests.query_method import QueryMethod
@@ -47,15 +47,12 @@ class Query:
         formatted_fields = []
         for field, field_type in resolved_field_types.items():
             is_list = (
-                lambda f: isinstance(f, GenericAlias)
+                lambda f: is_generic_type(f)
                 and f.__origin__ == list  # noqa: E731
             )
-            is_primitive = lambda f: f.__name__ in [  # noqa: E731
-                "str",
-                "int",
-                "float",
-                "bool",
-            ]
+            is_primitive = lambda f: hasattr(f, "__name__") and f.__name__ in ["str", "int", "float", "bool"]  # noqa: E731
+
+            print(field_type, is_list(field_type), is_primitive(field_type))
 
             # If the field is a dataclass, generate a new query for it
             if dataclasses.is_dataclass(field_type):
