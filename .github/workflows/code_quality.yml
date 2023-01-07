@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}}
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
@@ -30,7 +30,7 @@ jobs:
         run: black --check gqlrequests
 
       - name: Run isort
-        run: isort --check .
+        run: isort --check gqlrequests
 
       - name: Run flake8
-        run: flake8
+        run: flake8 gqlrequests
