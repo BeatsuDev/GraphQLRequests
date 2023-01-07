@@ -69,6 +69,22 @@ def test_indent():
 """[1:-1]
 
 
+def test_nested_indent():
+    assert str(Query(NestedType, indents=2)) == """
+{
+  id
+  age
+  something {
+    id
+    age
+    money
+    name
+    company
+  }
+}
+"""[1:-1]
+
+
 def test_query_selection():
     assert str(Query(EveryType, fields=["id", "age"])) == """
 {
