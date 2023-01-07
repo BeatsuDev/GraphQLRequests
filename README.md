@@ -23,19 +23,19 @@ class Character:
     appearsIn: list[Episode]
 
 print(gqlrequests.Schema(Character))
-# type Character {          
-#     appearsIn: [Episode]
+# type Character {
 #     name: String
+#     appearsIn: [Episode]
 # }
 #
 
 print(gqlrequests.Query(Character))
 # {
+#     name
 #     appearsIn {
 #         name
 #         length
 #     }
-#     name
 # } 
 
 print(gqlrequests.Query(Character, fields=["name"]))
@@ -45,39 +45,41 @@ print(gqlrequests.Query(Character, fields=["name"]))
 
 print(gqlrequests.Query(Character, indents=2)) # Default indent is 4
 # {
+#   name
 #   appearsIn {
 #     name
 #     length
 #   }
-#   name
 # }
 
 print(gqlrequests.QueryMethod("get_character", Character, args={"name": "Luke"}))
 # get_character(name: "Luke") {
+#     name
 #     appearsIn {
 #         name
 #         length
 #     }
-#     name
 # }
+
+appearsIn = gqlrequests.QueryMethod(
+    "appearsIn",
+    Episode,
+    args = {"minLength": 5}
+)
 
 print(gqlrequests.Query(
     Character,
     fields = [
         "name", 
-        gqlrequests.QueryMethod(
-            "appearsIn",
-            Episode,
-            args = {"minLength": 5}
-        )
+        appearsIn
     ]
 ))
 # {
+#     name
 #     appearsIn(minLength: 5) {
 #         name
 #         length
 #     }
-#     name
 # } 
 ```
 Future possible implementations:
