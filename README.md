@@ -39,7 +39,7 @@ print(gqlrequests.Query(Character, fields=["name"]))
 #     name
 # } 
 
-print(gqlrequests.Query(Character, indent=2)) # Default indent is 4
+print(gqlrequests.Query(Character, indents=2)) # Default indent is 4
 # {
 #   appearsIn {
 #     name
