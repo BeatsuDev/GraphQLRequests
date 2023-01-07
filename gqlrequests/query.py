@@ -6,6 +6,7 @@ from types import GenericAlias
 
 if typing.TYPE_CHECKING:
     from gqlrequests.query_method import QueryMethod
+
     from .utilities import DataclassType
 
 
