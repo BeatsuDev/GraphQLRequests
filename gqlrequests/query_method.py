@@ -16,8 +16,9 @@ class QueryMethod(Query):
         args: Optional[Dict[str, Any]] = None,
         fields: Optional[List[str | DataclassType | QueryMethod]] = None,
         indents: int = 4,
+        start_indent: int = 0,
     ):
-        super().__init__(dataclass_schema, fields, indents)
+        super().__init__(dataclass_schema, fields, indents, start_indent)
         self.method_name = method_name
         self.dataclass_schema = dataclass_schema
         self.args = args or {}
