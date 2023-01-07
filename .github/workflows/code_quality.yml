@@ -6,6 +6,7 @@ on: [push, pull_request]
 jobs:
   code-quality:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
         python-version: [3.7, 3.11]
