@@ -47,7 +47,8 @@ class Query:
         formatted_fields = []
         for field, field_type in resolved_field_types.items():
             is_list = (
-                lambda f: isinstance(f, GenericAlias) and f.__origin__ == list  # noqa: E731
+                lambda f: isinstance(f, GenericAlias)
+                and f.__origin__ == list  # noqa: E731
             )
             is_primitive = lambda f: f.__name__ in [  # noqa: E731
                 "str",
