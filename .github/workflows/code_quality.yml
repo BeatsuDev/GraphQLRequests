@@ -1,0 +1,36 @@
+# Run linting and mypy on commits and pull requests
+name: Code Quality
+
+on: [push, pull_request]
+  
+jobs:
+  code-quality:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.7, 3.11]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install mypy black isort flake8
+
+      - name: Run mypy
+        run: mypy gqlrequests
+
+      - name: Run black
+        run: black --check gqlrequests
+
+      - name: Run isort
+        run: isort --check .
+
+      - name: Run flake8
+        run: flake8
