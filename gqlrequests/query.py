@@ -37,14 +37,23 @@ class Query:
         # Only include the fields of the dataclass that are in the fields list
         included_fields = fields or field_names
         resolved_field_types = {
-            name: resolved_hints[name] for name in field_names if name in included_fields
+            name: resolved_hints[name]
+            for name in field_names
+            if name in included_fields
         }
 
         # Build the fields string
         formatted_fields = []
         for field, field_type in resolved_field_types.items():
-            is_list = lambda f: isinstance(f, GenericAlias) and f.__origin__ == list  # noqa: E731
-            is_primitive = lambda f: f.__name__ in ["str", "int", "float", "bool"]  # noqa: E731
+            is_list = (
+                lambda f: isinstance(f, GenericAlias) and f.__origin__ == list
+            )  # noqa: E731
+            is_primitive = lambda f: f.__name__ in [
+                "str",
+                "int",
+                "float",
+                "bool",
+            ]  # noqa: E731
 
             # If the field is a dataclass, generate a new query for it
             if dataclasses.is_dataclass(field_type):
@@ -73,7 +82,7 @@ class Query:
             else:
                 raise ValueError(
                     f'The field "{field}" of "{self.dataclass_schema.__name__}" is not'
-                    'a primitive type or a dataclass, or a list containing either.'
+                    "a primitive type or a dataclass, or a list containing either."
                 )
 
             formatted_fields.append(" " * indents + field_string)
