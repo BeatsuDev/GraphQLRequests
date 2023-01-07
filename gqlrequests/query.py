@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import typing
-from typing import Any
-from typing import Optional
-from typing import List
+from typing import List, Optional
 
 from typing_inspect import is_generic_type  # type: ignore
 
@@ -18,7 +16,7 @@ class Query:
     def __init__(
         self,
         dataclass_schema: DataclassType,
-        fields: Optional[List[str, DataclassType, QueryMethod]] = None,
+        fields: Optional[List[str | DataclassType | QueryMethod]] = None,
         indents: int = 4,
     ):
         self.dataclass_schema = dataclass_schema
@@ -28,7 +26,7 @@ class Query:
     def _generate_fields(
         self,
         dataclass_schema: DataclassType,
-        fields: Optional[List[str, DataclassType, QueryMethod]] = None,
+        fields: Optional[List[str | DataclassType | QueryMethod]] = None,
         indents: int = 0,
     ) -> str:
         """A recursive method to generate the fields of a query."""
@@ -96,11 +94,14 @@ class Query:
                 )
 
             formatted_fields.append(" " * indents + field_string)
-        
-        # Now add the fields that are QueryMethods (these were skipped in the beginning because they don't have type hints or dataclass field) 
-        for field in included_fields:
-            if field.__class__.__name__ == "QueryMethod":
-                formatted_fields.append(field._generate_query(self.indents + indents))
+
+        # Now add the fields that are QueryMethods (these were skipped in the
+        # beginning because they don't have type hints or dataclass field)
+        for query_method_field in included_fields:
+            if (
+                query_method_field.__class__.__name__ == "QueryMethod"
+            ):  # Mypy doesn't recognize QueryMethod as a class
+                formatted_fields.append(query_method_field._generate_query(self.indents + indents))  # type: ignore
 
         return "\n".join(formatted_fields)
 
