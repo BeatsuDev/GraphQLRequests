@@ -83,7 +83,7 @@ def test_nested_types():
 {
     id
     age
-    {
+    something {
         id
         age
         money
