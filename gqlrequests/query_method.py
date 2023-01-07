@@ -32,7 +32,7 @@ class QueryMethod(Query):
                 argument_list.append(f"{key}: {str(value).lower()}")
             else:
                 argument_list.append(f"{key}: {value}")
-        return " " * indents + f"{self.method_name}({', '.join(argument_list)})"
+        return " " * (self.start_indent + indent) + f"{self.method_name}({', '.join(argument_list)})"
 
     def _generate_query(self, indents: int = 4) -> str:
         return f"{self._create_method_head(indents-4)} " + super()._generate_query(
