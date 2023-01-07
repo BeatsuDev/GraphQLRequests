@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from gqlrequests import Query
+from gqlrequests.query import Query
 
 
 @dataclass
@@ -29,23 +29,23 @@ class ListedType:
 def test_primitive_types():
     assert str(Query(EveryType)) == """
 {
-    age
-    company
     id
+    age
     money
     name
+    company
 }
 """[1:-1]
 
 
 def test_indent():
-    assert str(Query(EveryType, indent=2)) == """
+    assert str(Query(EveryType, indents=2)) == """
 {
-  age
-  company
   id
+  age
   money
   name
+  company
 }
 """[1:-1]
 
@@ -53,8 +53,8 @@ def test_indent():
 def test_query_selection():
     assert str(Query(EveryType, fields=["id", "age"])) == """
 {
-    age
     id
+    age
 }
 """[1:-1]
 
@@ -62,14 +62,14 @@ def test_query_selection():
 def test_nested_types():
     assert str(Query(NestedType)) == """
 {
-    age
     id
-    something {
-        age
-        company
+    age
+    {
         id
+        age
         money
         name
+        company
     }
 }
 """[1:-1]
@@ -81,11 +81,11 @@ def test_listed_types():
     id
     names
     types {
-        age
-        company
         id
+        age
         money
         name
+        company
     }
 }
 """[1:-1]
