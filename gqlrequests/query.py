@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import typing
+from typing import List
 
 from typing_inspect import is_generic_type  # type: ignore
 
@@ -15,7 +16,7 @@ class Query:
     def __init__(
         self,
         dataclass_schema: DataclassType,
-        fields: list[str | Query | QueryMethod] | None = None,
+        fields: List[str | Query | QueryMethod] | None = None,
         indents: int = 4,
     ):
         self.dataclass_schema = dataclass_schema
@@ -25,7 +26,7 @@ class Query:
     def _generate_fields(
         self,
         dataclass_schema: DataclassType,
-        fields: list[str | Query | QueryMethod] | None,
+        fields: List[str | Query | QueryMethod] | None,
         indents: int = 0,
     ) -> str:
         """A recursive method to generate the fields of a query."""
