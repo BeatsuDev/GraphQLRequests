@@ -18,11 +18,13 @@ class Query:
         dataclass_schema: DataclassType,
         fields: Optional[List[str | DataclassType | QueryMethod]] = None,
         indents: int = 4,
+        start_indent: int = 0,
         strip_underscores_for_keywords: bool = True,
     ):
         self.dataclass_schema = dataclass_schema
         self.fields = fields
         self.indents = indents
+        self.start_indent = start_indent
         self.strip = strip_underscores_for_keywords
 
     def _generate_fields(
@@ -118,10 +120,10 @@ class Query:
             "{\n"
             + self._generate_fields(self.dataclass_schema, self.fields, indents)
             + "\n"
-            + " " * (indents - 4)
+            + " " * (indents - self.indents)
             + "}"
         )
         return query
 
     def __str__(self) -> str:
-        return self._generate_query(self.indents)
+        return self._generate_query(self.start_indent + self.indents)

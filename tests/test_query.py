@@ -125,3 +125,17 @@ def test_keyword_as_property_gets_stripped_for_underscores():
     as
 }
 """[1:-1]
+
+def test_start_indent():
+    # Note that the first bracket is not indented. This is intentional because
+    # it is meant to be used in as a field value in a query, where the first
+    # bracket is only 1 whitespace away from the field name
+    assert str(Query(EveryType, indents=2, start_indent=2)) == """
+{
+    id
+    age
+    money
+    name
+    company
+  }
+"""[1:-1]
