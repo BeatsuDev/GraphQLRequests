@@ -1,8 +1,11 @@
 # Run pytests and generate coverage
 name: Pytests and Coverage
 
-on: [push, pull_request]
-  - branch: [master]
+on:
+  push:
+    branches: master
+  pull_request:
+    branches: master
 
 jobs:
   pytests:
