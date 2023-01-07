@@ -69,7 +69,11 @@ class Query:
 
             # If the field is a dataclass, generate a new query for it
             if dataclasses.is_dataclass(field_type):
-                field_string = field + " " Query(field_type)._generate_query(self.indents + indents)
+                field_string = (
+                    field
+                    + " "
+                    + Query(field_type)._generate_query(self.indents + indents)
+                )
 
             # If the field is a list containing a dataclass, generate a new query for the first dataclass in the list
             elif is_list(field_type) and dataclasses.is_dataclass(
