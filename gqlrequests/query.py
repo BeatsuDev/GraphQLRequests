@@ -6,10 +6,9 @@ from typing import List, Optional
 
 from typing_inspect import is_generic_type  # type: ignore
 
-if typing.TYPE_CHECKING:
-    from gqlrequests.query_method import QueryMethod
-
-    from .utilities import DataclassType
+if typing.TYPE_CHECKING:  # pragma: no cover
+    from .custom_type_hints import DataclassType
+    from .query_method import QueryMethod
 
 
 class Query:
