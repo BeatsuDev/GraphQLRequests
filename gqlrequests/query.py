@@ -35,9 +35,9 @@ class Query:
         field_names = [field.name for field in dataclasses.fields(dataclass_schema)]
 
         # Only include the fields of the dataclass that are in the fields list
-        fields = fields or field_names
+        included_fields = fields or field_names
         resolved_field_types = {
-            name: resolved_hints[name] for name in field_names if name in fields
+            name: resolved_hints[name] for name in field_names if name in included_fields
         }
 
         # Build the fields string
