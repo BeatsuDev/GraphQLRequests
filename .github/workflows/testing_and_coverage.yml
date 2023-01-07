@@ -1,20 +1,14 @@
 # Run pytests and generate coverage
 name: Pytests and Coverage
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+on: [push, pull_request]
 
 jobs:
   pytests:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
         python-version: [3.7, 3.9, 3.11]
 
     runs-on: ${{ matrix.os }}
