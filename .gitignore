@@ -2,6 +2,11 @@ test.py
 *cache
 __pycache__
 
+# Coverage reports
+htmlcov
+.coverage
+coverage.*
+
 # Build stuff
 build
 dist
