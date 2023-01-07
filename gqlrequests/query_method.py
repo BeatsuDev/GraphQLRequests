@@ -22,7 +22,7 @@ class QueryMethod(Query):
         self.dataclass_schema = dataclass_schema
         self.args = args or {}
 
-    def __str__(self) -> str:
+    def _create_method_head(self, indents = 0) -> str:
         argument_list = []
         for key, value in self.args.items():
             if isinstance(value, str):
@@ -31,6 +31,10 @@ class QueryMethod(Query):
                 argument_list.append(f"{key}: {str(value).lower()}")
             else:
                 argument_list.append(f"{key}: {value}")
+        return " " * indents + f"{self.method_name}({', '.join(argument_list)})"
+    
+    def _generate_query(self, indents: int = 4) -> str:
+        return f"{self._create_method_head(indents-4)} " + super()._generate_query(indents)
 
-        arguments = ", ".join(argument_list)
-        return f"{self.method_name}({arguments}) " + super()._generate_query(self.indents)
+    def __str__(self) -> str:
+        return self._generate_query(self.indents)

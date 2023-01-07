@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import dataclasses
 import typing
+from typing import Any
+from typing import Optional
 from typing import List
 
 from typing_inspect import is_generic_type  # type: ignore
@@ -16,7 +18,7 @@ class Query:
     def __init__(
         self,
         dataclass_schema: DataclassType,
-        fields: List[str | Query | QueryMethod] | None = None,
+        fields: Optional[List[str, DataclassType, QueryMethod]] = None,
         indents: int = 4,
     ):
         self.dataclass_schema = dataclass_schema
@@ -26,7 +28,7 @@ class Query:
     def _generate_fields(
         self,
         dataclass_schema: DataclassType,
-        fields: List[str | Query | QueryMethod] | None,
+        fields: Optional[List[str, DataclassType, QueryMethod]] = None,
         indents: int = 0,
     ) -> str:
         """A recursive method to generate the fields of a query."""
@@ -45,6 +47,10 @@ class Query:
             if name in included_fields
         }
 
+        # Build the fields string
+        formatted_fields = []
+
+        # Helper functions that will be used to determine the type of the field
         def is_list(f):
             return is_generic_type(f) and f.__origin__ == list
 
@@ -56,13 +62,12 @@ class Query:
                 "bool",
             ]
 
-        # Build the fields string
-        formatted_fields = []
+        # First add the fields that are not QueryMethods (this will be added last)
         for field, field_type in resolved_field_types.items():
 
             # If the field is a dataclass, generate a new query for it
             if dataclasses.is_dataclass(field_type):
-                field_string = Query(field_type)._generate_query(indents + self.indents)
+                field_string = Query(field_type)._generate_query(self.indents + indents)
 
             # If the field is a list containing a dataclass, generate a new query for the first dataclass in the list
             elif is_list(field_type) and dataclasses.is_dataclass(
@@ -91,8 +96,12 @@ class Query:
                 )
 
             formatted_fields.append(" " * indents + field_string)
+        
+        # Now add the fields that are QueryMethods (these were skipped in the beginning because they don't have type hints or dataclass field) 
+        for field in included_fields:
+            if field.__class__.__name__ == "QueryMethod":
+                formatted_fields.append(field._generate_query(self.indents + indents))
 
-        # Remove the last newline (this gets added in _generate_query)
         return "\n".join(formatted_fields)
 
     def _generate_query(self, indents: int = 4) -> str:
