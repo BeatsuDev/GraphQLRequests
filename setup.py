@@ -13,6 +13,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=["gqlrequests"],
+    package_data={"gqlrequests": ["py.typed"]},
     install_requires=["typing_inspect~=0.8.0"],
     license="MIT",
     version=__version__,
