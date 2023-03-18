@@ -14,7 +14,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=["gqlrequests"],
     package_data={"gqlrequests": ["py.typed"]},
-    install_requires=["typing_inspect~=0.8.0"],
+    install_requires=["typing_inspect~=0.8.0", "pytest~=7.2.1"],
     license="MIT",
     version=__version__,
     description="A Python library for making GraphQL requests easier!",

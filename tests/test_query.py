@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 from typing import List
 
 import pytest
@@ -43,6 +44,17 @@ class DatatypeWithKeywordAsProperty:
     type: str  # This is okay, because type is a reserved *function*, not keyword
     from_: str
     as_: int
+
+
+class SomeEnumClass(Enum):
+    ONE = 1
+    TWO = 2
+    THREE = 3
+
+
+@dataclass
+class ClassWithEnumeratedFieldType:
+    enumerated: SomeEnumClass
 
 
 def test_primitive_types():
@@ -125,13 +137,15 @@ def test_listed_types():
 }
 """[1:-1]
 
+
 def test_invalid_type_throws_value_error():
     with pytest.raises(ValueError) as e:
         str(Query(InvalidType))
-    
+
     # Ensure the error message contains the name of the invalid property 
     # and the name of the class - this is to help the user debug the issue
     assert "invalidProperty" in str(e.value) and "InvalidType" in str(e.value)
+
 
 def test_keyword_as_property_gets_stripped_for_underscores():
     assert str(Query(DatatypeWithKeywordAsProperty)) == """
@@ -141,6 +155,7 @@ def test_keyword_as_property_gets_stripped_for_underscores():
     as
 }
 """[1:-1]
+
 
 def test_start_indent():
     # Note that the first bracket is not indented. This is intentional because
@@ -154,4 +169,12 @@ def test_start_indent():
     name
     company
   }
+"""[1:-1]
+
+
+def test_enumerated_field_type():
+    assert str(Query(ClassWithEnumeratedFieldType)) == """
+{
+    enumerated
+}
 """[1:-1]
