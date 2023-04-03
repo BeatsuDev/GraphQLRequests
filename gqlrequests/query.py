@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import dataclasses
 import typing
+from enum import Enum
 from keyword import iskeyword
 from typing import List, Optional
-from enum import Enum
 
 from typing_inspect import is_generic_type  # type: ignore
 
@@ -72,7 +72,6 @@ class Query:
 
         # First add the fields that are not QueryMethods (this will be added last)
         for field, field_type in resolved_field_types.items():
-
             # If the field is a dataclass, generate a new query for it
             if dataclasses.is_dataclass(field_type):
                 field_string = (
@@ -99,9 +98,11 @@ class Query:
                     )
 
             # If the field is a list of primtives, or just a primtive, only add the field name
-            elif is_primitive(field_type) or (
-                is_list(field_type) and is_primitive(field_type.__args__[0])
-            ) or is_enumerated(field_type):
+            elif (
+                is_primitive(field_type)
+                or (is_list(field_type) and is_primitive(field_type.__args__[0]))
+                or is_enumerated(field_type)
+            ):
                 field_string = field
 
             # If the field is not a primitive type or a dataclass (or any of those two in a list), raise an error
