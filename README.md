@@ -3,9 +3,9 @@
 [![Code Quality](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/code_quality.yml/badge.svg)](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/code_quality.yml)
 [![codecov](https://codecov.io/gh/BeatsuDev/GraphQLRequests/branch/master/graph/badge.svg?token=FBQKU5OEWT)](https://codecov.io/gh/BeatsuDev/GraphQLRequests)
 
-Define GraphQL types in Python as dataclasses, then use them to automatically build queries. Or even simpler;
-gqlrequests will automatically build the dataclasses for you given the api endpoint by using introspection! (Now that's awesome).
-You no longer need to define your requests as multiline strings - you can store and manipulate them as dataclasses (hence no strings attached).
+Define GraphQL types in Python as classes, then use them to automatically build queries. Or even simpler;
+gqlrequests will automatically build the classes for you given the api endpoint by using introspection! (Now that's awesome).
+You no longer need to define your requests as multiline strings (hence no strings attached).
 
 **These examples show what I envision this module to become. Very few of these features have been developed yet, but I'm getting to it when I have time!**
 Examples of how it will work:
@@ -13,24 +13,22 @@ Examples of how it will work:
 from dataclasses import dataclass
 import gqlrequests
 
-@dataclass
-class Episode:
+class Episode(gqlrequests.Schema):
     name: str
     length: float
 
-@dataclass
-class Character:
+class Character(gqlrequests.Schema):
     name: str
     appearsIn: list[Episode]
 
-print(gqlrequests.Schema(Character))
+print(Character)
 # type Character {
 #     name: String
 #     appearsIn: [Episode]
 # }
 #
 
-print(gqlrequests.Query(Character))
+print(gqlrequests.create_query(Character))
 # {
 #     name
 #     appearsIn {
@@ -39,12 +37,12 @@ print(gqlrequests.Query(Character))
 #     }
 # } 
 
-print(gqlrequests.Query(Character, fields=["name"]))
+print(gqlrequests.create_query(Character, fields=["name"]))
 # {
 #     name
 # } 
 
-print(gqlrequests.Query(Character, indents=2)) # Default indent is 4
+print(gqlrequests.create_query(Character, indents=2)) # Default indent is 4
 # {
 #   name
 #   appearsIn {
@@ -53,7 +51,7 @@ print(gqlrequests.Query(Character, indents=2)) # Default indent is 4
 #   }
 # }
 
-print(gqlrequests.QueryMethod("get_character", Character, args={"name": "Luke"}))
+print(gqlrequests.create_query_method("get_character", Character, args={"name": "Luke"}))
 # get_character(name: "Luke") {
 #     name
 #     appearsIn {
@@ -62,16 +60,12 @@ print(gqlrequests.QueryMethod("get_character", Character, args={"name": "Luke"})
 #     }
 # }
 
-appearsIn = gqlrequests.QueryMethod(
-    "appearsIn",
-    Episode,
-    args = {"minLength": 5}
-)
+appearsIn = gqlrequests.create_query_method("appearsIn", Episode, args = {"minLength": 5})
 
-print(gqlrequests.Query(
+print(gqlrequests.create_query(
     Character,
     fields = [
-        "name", 
+        "name",
         appearsIn
     ]
 ))
@@ -83,7 +77,7 @@ print(gqlrequests.Query(
 #     }
 # } 
 ```
-Interacting with a GraphQL endpoint:
+Interacting with a GraphQL endpoint (gql already does this, but this would be nicer imo):
 ```py
 import gqlrequests
 import asyncio
@@ -97,7 +91,7 @@ gqlclient = gqlrequests.Client(
 RootQuery = gqlclient.introspect()
 Character, Episode = RootQuery.Character, RootQuery.Episode
 
-character = gqlclient.query(gqlrequests.Query(Character))
+character = gqlclient.query(gqlrequests.create_query(Character))
 assert isinstance(character, Character)
 
 # Asynchronous queries 
@@ -108,8 +102,8 @@ async def main():
     )
 
     queries = asyncio.gather(
-        gqlclient.query(gqlrequests.Query(Character)),
-        gqlclient.query(gqlrequests.Query(Episode))
+        gqlclient.query(gqlrequests.create_query(Character)),
+        gqlclient.query(gqlrequests.create_query(Episode))
     )
 
     character, episode = await queries
@@ -118,7 +112,7 @@ async def main():
     assert isinstance(episode, Episode)
 
     # Or simply:
-    character = await gqlclient.query(gqlrequests.Query(Character))
+    character = await gqlclient.query(gqlrequests.create_query(Character))
 
 asyncio.run(main())
 ```
@@ -140,7 +134,7 @@ async def main():
         authorization="abcdefghijklmnopqrstuvwxyz"
     )
 
-    query = gqlrequests.Query(LiveViewers)
+    query = gqlrequests.create_query(LiveViewers)
     async with gqlclient.subscribe(query) as subscription:
         async for data in subscription:
             assert isinstance(data, LiveViewers)
@@ -149,4 +143,24 @@ async def main():
             if data.viewers < 10: break
 
 asyncio.run(main())
+```
+
+## Edge cases
+Some attributes are reserved keywords in Python, such as `from`, `is` and `not`. These cannot be reference to
+by property like this: `some_query_result.from`. Therefore for now, this edge case will be solved by using this
+optional syntax:
+
+```py
+import gqlrequests
+import asyncio
+
+class Character(gqlrequests.Schema):
+    name: str
+    appearsIn: list[Episode]
+
+# gqlrequests.add_field(Schema, field_name, type)
+gqlrequests.add_field(Character, "from", str)
+
+character = gqlrequests.create_query(Character)
+character_from = character["from"]
 ```
