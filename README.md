@@ -1,12 +1,13 @@
-# gqlrequests - A Python library for creating GraphQL queries easier!
+# gqlrequests - Create requests to GraphQL APIs with no strings attached 😉
 [![Pytests and Coverage](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/testing_and_coverage.yml/badge.svg)](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/testing_and_coverage.yml)
 [![Code Quality](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/code_quality.yml/badge.svg)](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/code_quality.yml)
 [![codecov](https://codecov.io/gh/BeatsuDev/GraphQLRequests/branch/master/graph/badge.svg?token=FBQKU5OEWT)](https://codecov.io/gh/BeatsuDev/GraphQLRequests)
 
-Define GraphQL types in Python as dataclasses, then use them to automatically build queries! 
+Define GraphQL types in Python as dataclasses, then use them to automatically build queries. Or even simpler;
+gqlrequests will automatically build the dataclasses for you given the api endpoint by using introspection! (Now that's awesome).
+You no longer need to define your requests as multiline strings - you can store and manipulate them as dataclasses (hence no strings attached).
 
-**Note that these examples show what the end goal is, and that very few of these features have been developed yet!**
-
+**These examples show what I envision this module to become. Very few of these features have been developed yet, but I'm getting to it when I have time!**
 Examples of how it will work:
 ```py
 from dataclasses import dataclass
@@ -82,32 +83,24 @@ print(gqlrequests.Query(
 #     }
 # } 
 ```
-Future possible implementations:
+Interacting with a GraphQL endpoint:
 ```py
 import gqlrequests
 import asyncio
 
-@dataclass
-class Episode:
-    name: str
-    length: float
-
-@dataclass
-class Character:
-    name: str
-    appearsIn: list[Episode]
-
-
+# Normal query
 gqlclient = gqlrequests.Client(
     api_endpoint="api.example.com/gql",
     authorization="abcdefghijklmnopqrstuvwxyz"
 )
 
+RootQuery = gqlclient.introspect()
+Character, Episode = RootQuery.Character, RootQuery.Episode
+
 character = gqlclient.query(gqlrequests.Query(Character))
 assert isinstance(character, Character)
 
-# Asynchronous queries
-
+# Asynchronous queries 
 async def main():
     gqlclient = gqlrequests.AsyncClient(
         api_endpoint="api.example.com/gql",
@@ -133,6 +126,7 @@ asyncio.run(main())
 """Subscribing to a graphql websocket"""
 import gqlrequests
 import asyncio
+
 
 @dataclass
 class LiveViewers:
