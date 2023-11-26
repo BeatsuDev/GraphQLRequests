@@ -13,11 +13,11 @@ Examples of how it will work:
 from dataclasses import dataclass
 import gqlrequests
 
-class Episode(gqlrequests.Schema):
+class Episode(gqlrequests.Type):
     name: str
     length: float
 
-class Character(gqlrequests.Schema):
+class Character(gqlrequests.Type):
     name: str
     appearsIn: list[Episode]
 
@@ -154,11 +154,11 @@ optional syntax:
 import gqlrequests
 import asyncio
 
-class Character(gqlrequests.Schema):
+class Character(gqlrequests.Type):
     name: str
     appearsIn: list[Episode]
 
-# gqlrequests.add_field(Schema, field_name, type)
+# gqlrequests.add_field(Type, field_name, type)
 gqlrequests.add_field(Character, "from", str)
 
 character = gqlrequests.create_query(Character)
