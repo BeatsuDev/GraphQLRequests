@@ -10,7 +10,6 @@ You no longer need to define your requests as multiline strings (hence no string
 **These examples show what I envision this module to become. Very few of these features have been developed yet, but I'm getting to it when I have time!**
 Examples of how it will work:
 ```py
-from dataclasses import dataclass
 import gqlrequests
 
 class Episode(gqlrequests.Type):
@@ -146,8 +145,8 @@ asyncio.run(main())
 ```
 
 ## Edge cases
-Some attributes are reserved keywords in Python, such as `from`, `is` and `not`. These cannot be reference to
-by property like this: `some_query_result.from`. Therefore for now, this edge case will be solved by using this
+Some attributes are reserved keywords in Python, such as `from`, `is` and `not`. These cannot be referenced to
+by property like this: `some_query_result.from`. For now, this edge case will be solved by using this
 optional syntax:
 
 ```py
@@ -162,5 +161,5 @@ class Character(gqlrequests.Type):
 gqlrequests.add_field(Character, "from", str)
 
 character = gqlrequests.create_query(Character)
-character_from = character["from"]
+character_from = character["from"]  # This syntax
 ```
