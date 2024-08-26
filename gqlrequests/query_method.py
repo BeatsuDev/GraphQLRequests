@@ -1,11 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
-
 from .query import Query
-
-if TYPE_CHECKING:  # pragma: no cover
-    from .custom_type_hints import DataclassType
 
 
 class QueryMethod(Query):
