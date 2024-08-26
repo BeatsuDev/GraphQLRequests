@@ -90,13 +90,14 @@ gqlclient = gqlrequests.Client(
     authorization="abcdefghijklmnopqrstuvwxyz"
 )
 
-RootQuery = gqlclient.introspect()
-Character, Episode = RootQuery.Character, RootQuery.Episode
+schema, types = gqlclient.introspect()
+character_search_query = types.Character(func_name="findCharacter")
 
-character = gqlclient.query(gqlrequests.create_query(Character))
-assert isinstance(character, Character)
+character = gqlclient.execute(character_search_query(name="Luke").build())
+print(character.name)
 
 # Asynchronous queries
+RootQuery = schema.RootQuery
 async def main():
     gqlclient = gqlrequests.AsyncClient(
         api_endpoint="api.example.com/gql",
@@ -104,17 +105,14 @@ async def main():
     )
 
     queries = asyncio.gather(
-        gqlclient.query(gqlrequests.create_query(Character)),
-        gqlclient.query(gqlrequests.create_query(Episode))
+        gqlclient.execute(RootQuery(fields=["character"]).build()),
+        gqlclient.execute(RootQuery(fields=["episode"]).build())
     )
 
     character, episode = await queries
 
-    assert isinstance(character, Character)
-    assert isinstance(episode, Episode)
-
     # Or simply:
-    character = await gqlclient.query(gqlrequests.create_query(Character))
+    character = await gqlclient.execute(RootQuery().build())
 
 asyncio.run(main())
 ```
@@ -124,10 +122,15 @@ asyncio.run(main())
 import gqlrequests
 import asyncio
 
+schema, types = gqlrequests.introspect()
+RootMutation = schema.RootMutation
 
-class LiveViewers(gqlrequests.QueryBuilder):
-    viewers: int
-    measurementTimeUnix: int
+
+# Example of how the type of RootMutation.live could look like:
+#
+# class LiveViewers(gqlrequests.QueryBuilder):
+#     viewers: int
+#     measurementTimeUnix: int
 
 
 async def main():
@@ -136,8 +139,9 @@ async def main():
         authorization="abcdefghijklmnopqrstuvwxyz"
     )
 
-    query = gqlrequests.create_query(LiveViewers)
-    async with gqlclient.subscribe(query) as subscription:
+    query_string = RootMutation(fields=["live"]).build()
+
+    async with gqlclient.subscribe(query_string) as subscription:
         async for data in subscription:
             assert isinstance(data, LiveViewers)
 
@@ -150,20 +154,17 @@ asyncio.run(main())
 ## Edge cases
 
 Some attributes are reserved keywords in Python, such as `from`, `is` and `not`. These cannot be referenced to
-by property like this: `some_query_result.from`. For now, this edge case will be solved by using this
-optional syntax:
-
+by property like this: `some_query_result.from`. This can be circumvented by using the `StrippedUnderscoreQueryBuilder` like such;
 ```py
-import gqlrequests
-import asyncio
+class Time(gqlrequests.StrippedUnderscoreQueryBuilder):
+    _from: int
+    _to: int
+    value: float
 
-class Character(gqlrequests.Type):
-    name: str
-    appearsIn: list[Episode]
-
-# gqlrequests.add_field(Type, field_name, type)
-gqlrequests.add_field(Character, "from", str)
-
-character = gqlrequests.create_query(Character)
-character_from = character["from"]  # This syntax
+print(Time().build())
+# {
+#     from
+#     to
+#     value
+# }
 ```
