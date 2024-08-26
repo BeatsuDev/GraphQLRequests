@@ -2,7 +2,7 @@ import pytest
 import gqlrequests
 
 
-class EveryType(gqlrequests.Type):
+class EveryType(gqlrequests.QueryBuilder):
     id: int
     age: int
     money: float
@@ -119,7 +119,7 @@ methodName() {
     assert every_type().build() == correct_string 
 
 
-class NestedType(gqlrequests.Type):
+class NestedType(gqlrequests.QueryBuilder):
     id: int
     age: int
     something: EveryType
