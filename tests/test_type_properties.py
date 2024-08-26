@@ -1,7 +1,7 @@
 import pytest
 import gqlrequests
 
-class EveryType(gqlrequests.Type):
+class EveryType(gqlrequests.QueryBuilder):
     id: int
     age: int
     money: float
@@ -46,7 +46,7 @@ def test_setting_invalid_property_type():
     assert "str" in str(e.value).lower()
 
 
-class NestedType(gqlrequests.Type):
+class NestedType(gqlrequests.QueryBuilder):
     id: int
     age: int
     something: EveryType

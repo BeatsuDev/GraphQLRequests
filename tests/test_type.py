@@ -1,7 +1,8 @@
 import pytest
 import gqlrequests
+import enum
 
-class EveryType(gqlrequests.Type):
+class EveryType(gqlrequests.QueryBuilder):
     id: int
     age: int
     money: float
@@ -69,7 +70,7 @@ def test_selecting_no_fields_and_converting_to_string_raises_value_error():
     assert "no fields selected" in str(e.value).lower()
 
 
-class NestedType(gqlrequests.Type):
+class NestedType(gqlrequests.QueryBuilder):
     id: int
     age: int
     something: EveryType
@@ -110,7 +111,7 @@ def test_nested_types():
     assert NestedType().build() == correct_string
 
 
-class ListedType(gqlrequests.Type):
+class ListedType(gqlrequests.QueryBuilder):
     id: int
     names: list[str]
     types: list[EveryType]
@@ -134,11 +135,11 @@ def test_listed_types():
     assert ListedType().build() == correct_string
 
 
-class SomeClass(gqlrequests.Type):
+class SomeClass(gqlrequests.QueryBuilder):
     pass
 
 
-class InvalidType(gqlrequests.Type):
+class InvalidType(gqlrequests.QueryBuilder):
     invalidProperty: SomeClass
 
 @pytest.mark.skip(reason="Not implemented yet")
@@ -151,7 +152,7 @@ def test_invalid_type_throws_value_error():
     assert "invalidProperty" in str(e.value) and "InvalidType" in str(e.value)
 
 
-class DatatypeWithKeywordAsProperty(gqlrequests.Type):
+class DatatypeWithKeywordAsProperty(gqlrequests.QueryBuilder):
     type: str  # This is okay, because type is a reserved *function*, not keyword
     from_: str
     as_: int
@@ -169,13 +170,13 @@ def test_keyword_as_property_gets_stripped_for_underscores():
     assert DatatypeWithKeywordAsProperty().build() == correct_string
 
 
-class SomeEnumClass(gqlrequests.Enum):
+class SomeEnumClass(enum.Enum):
     ONE = 1
     TWO = 2
     THREE = 3
 
 
-class ClassWithEnumeratedFieldType(gqlrequests.Type):
+class ClassWithEnumeratedFieldType(gqlrequests.QueryBuilder):
     enumerated: SomeEnumClass
 
 
