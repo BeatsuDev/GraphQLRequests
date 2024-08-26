@@ -1,0 +1,189 @@
+import pytest
+import gqlrequests
+
+class EveryType(gqlrequests.Type):
+    id: int
+    age: int
+    money: float
+    name: str
+    company: bool
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_primitive_types():
+    correct_string = """
+{
+    id
+    age
+    money
+    name
+    company
+}
+"""
+    assert EveryType().build() == correct_string
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_indent():
+    correct_string = """
+{
+  id
+  age
+  money
+  name
+  company
+}
+"""
+    assert EveryType(indents=2).build() == correct_string
+
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_query_selection():
+    correct_string = """
+{
+    id
+    age
+}
+"""
+    assert EveryType(fields=["id", "age"]).build() == correct_string
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_start_indent():
+    # Note that the first bracket is not indented. This is intentional because
+    # it is meant to be used in as a field value in a query, where the first
+    # bracket is only 1 whitespace away from the field name
+    correct_string = """
+{
+    id
+    age
+    money
+    name
+    company
+  }
+"""
+    assert EveryType(indents=2, start_indent=2).build() == correct_string
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_selecting_no_fields_and_converting_to_string_raises_value_error():
+    with pytest.raises(ValueError) as e:
+        EveryType(fields=[]).build()
+
+    assert "no fields selected" in str(e.value).lower()
+
+
+class NestedType(gqlrequests.Type):
+    id: int
+    age: int
+    something: EveryType
+
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_nested_indent():
+    correct_string = """
+{
+  id
+  age
+  something {
+    id
+    age
+    money
+    name
+    company
+  }
+}
+"""
+    assert NestedType(indents=2).build() == correct_string
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_nested_types():
+    correct_string = """
+{
+    id
+    age
+    something {
+        id
+        age
+        money
+        name
+        company
+    }
+}
+"""
+    assert NestedType().build() == correct_string
+
+
+class ListedType(gqlrequests.Type):
+    id: int
+    names: list[str]
+    types: list[EveryType]
+
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_listed_types():
+    correct_string = """
+{
+    id
+    names
+    types {
+        id
+        age
+        money
+        name
+        company
+    }
+}
+"""
+    assert ListedType().build() == correct_string
+
+
+class SomeClass(gqlrequests.Type):
+    pass
+
+
+class InvalidType(gqlrequests.Type):
+    invalidProperty: SomeClass
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_invalid_type_throws_value_error():
+    with pytest.raises(ValueError) as e:
+        InvalidType()
+
+    # Ensure the error message contains the name of the invalid property 
+    # and the name of the class - this is to help the user debug the issue
+    assert "invalidProperty" in str(e.value) and "InvalidType" in str(e.value)
+
+
+class DatatypeWithKeywordAsProperty(gqlrequests.Type):
+    type: str  # This is okay, because type is a reserved *function*, not keyword
+    from_: str
+    as_: int
+
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_keyword_as_property_gets_stripped_for_underscores():
+    correct_string = """
+{
+    type
+    from
+    as
+}
+"""
+    assert DatatypeWithKeywordAsProperty().build() == correct_string
+
+
+class SomeEnumClass(gqlrequests.Enum):
+    ONE = 1
+    TWO = 2
+    THREE = 3
+
+
+class ClassWithEnumeratedFieldType(gqlrequests.Type):
+    enumerated: SomeEnumClass
+
+
+@pytest.mark.skip(reason="Not implemented yet")
+def test_enumerated_field_type():
+    correct_string = """
+{
+    enumerated
+}
+"""
+    assert ClassWithEnumeratedFieldType().build() == correct_string
