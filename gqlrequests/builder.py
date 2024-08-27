@@ -36,6 +36,8 @@ class QueryBuilder(abc.ABC):
     SUPPORTED_TYPES = (int, float, str, bool)
 
     _resolved_fields: Dict[str, type | QueryBuilder] | None = None
+    _func_args: Dict[str, Any] | None = None
+    _build_function: bool = False
 
     indent_size: int = 4
     start_indents: int = 0
@@ -75,6 +77,9 @@ class QueryBuilder(abc.ABC):
     def build(self) -> str:
         """Generates a GraphQL query string based on the fields set in the
         builder."""
+        if self._build_function:
+            return self._generate_function()
+
         if self.fields == []:
             raise ValueError("No fields were selected for the query builder.")
         build_output = "{\n"
@@ -136,3 +141,33 @@ class QueryBuilder(abc.ABC):
                 raise ValueError(f"Could not build {field} of type {field_type}.")
 
         return fields_string_output
+    
+    def __call__(self, **args) -> QueryBuilder:
+        """After calling this method, the builder will build a function."""
+        if not self.func_name:
+            raise ValueError("No function name was set for this builder.")
+
+        # TODO: Add support for non-primitive arguments
+        for key, value in args.items():
+            if type(value) not in self.SUPPORTED_TYPES:
+                raise ValueError(
+                    f"Function argument {key} of {self.func_name} must be of" +
+                    f"the following types: {self.SUPPORTED_TYPES}"
+                )
+
+        self._func_args = args
+        self._build_function = True
+
+        return self
+
+    def _generate_function(self) -> str:
+        func_args = ", ".join(
+            f"{key}: {value}" for key, value in self._func_args.items()
+        )
+
+        # Reset temporarily so that the next build call builds the rest of the query
+        self._build_function = False
+        build_output = f"{self.func_name}({func_args}) {self.build()}"
+        self._build_function = True
+
+        return build_output
