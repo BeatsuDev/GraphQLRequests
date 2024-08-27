@@ -7,6 +7,19 @@ class EveryType(gqlrequests.QueryBuilder):
     money: float
     name: str
     company: bool
+    
+def test_primtives_only_query_build():
+    correct_string = """
+{
+    id
+    age
+    money
+    name
+    company
+}
+""".lstrip()
+    every_type = EveryType().build()
+    assert str(every_type) == correct_string
 
 @pytest.mark.skip(reason="Not implemented yet")
 def test_setting_valid_property():
