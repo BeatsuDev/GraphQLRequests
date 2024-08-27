@@ -46,8 +46,13 @@ class QueryBuilder(abc.ABC):
         """Applies the given options to the builder state. This action
         overrides the current values of the builder."""
         if passed_fields := options.pop("fields", None):
+            if not isinstance(passed_fields, list):
+                raise ValueError("The fields option must be a list of strings.")
+            if not all(isinstance(field, str) for field in passed_fields):
+                raise ValueError("The fields option must be a list of strings.")
+
             for field in passed_fields:
-                if field not in self._resolved_fields:
+                if field not in (self._resolved_fields or []):
                     raise AttributeError(f"{field} is not a valid field for this builder.")
 
         self.fields = passed_fields
@@ -93,9 +98,9 @@ class QueryBuilder(abc.ABC):
             #    name: str
             #    NestedType  # <---
             # }
-            if type(field_type) in (type, abc.ABCMeta) and issubclass(field_type, QueryBuilder):
+            if type(field_type) in (type, abc.ABCMeta) and issubclass(field_type, QueryBuilder): # type: ignore
                 FieldBuilder = field_type
-                field_builder = FieldBuilder(
+                field_builder = FieldBuilder( # type: ignore
                     start_indents = len(whitespaces),
                     indent_size=self.indent_size
                 )
