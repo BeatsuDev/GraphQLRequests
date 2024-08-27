@@ -6,7 +6,7 @@ from __future__ import annotations
 import abc
 import enum
 import typing
-from typing import Dict, List
+from typing import Any, Dict, List
 
 
 class QueryBuilder(abc.ABC):
@@ -46,7 +46,7 @@ class QueryBuilder(abc.ABC):
         self._resolved_fields = typing.get_type_hints(self)
         self._process_options(options)
 
-    def _process_options(self, options: Dict[str, int | str | List[str]]) -> None:
+    def _process_options(self, options: Dict[str, Any]) -> None:
         """Applies the given options to the builder state. This action
         overrides the current values of the builder."""
         if passed_fields := options.pop("fields", None):
@@ -128,7 +128,7 @@ class QueryBuilder(abc.ABC):
             #   name
             # }
             elif self._resolved_fields[field] in self.SUPPORTED_TYPES or (
-                type(field_type) == enum.EnumType  # type: ignore
+                type(field_type) == enum.EnumMeta
             ):
                 fields_string_output += whitespaces + field + "\n"
 
