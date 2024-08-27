@@ -161,9 +161,10 @@ class QueryBuilder(abc.ABC):
         return self
 
     def _generate_function(self) -> str:
-        func_args = ", ".join(
-            f"{key}: {value}" for key, value in self._func_args.items()
-        )
+        if self._func_args:
+            func_args = ", ".join(
+                f"{key}: {value}" for key, value in self._func_args.items()
+            )
 
         # Reset temporarily so that the next build call builds the rest of the query
         self._build_function = False
