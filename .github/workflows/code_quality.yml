@@ -2,40 +2,31 @@
 name: Code Quality
 
 on: [push, pull_request]
-  
+
 jobs:
   code-quality:
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.7, 3.11]
+        python-version: [3.8, 3.12]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install library dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install typing-inspect
+      - uses: yezz123/setup-uv@v4
 
       - name: Install code quality checking dependencies
         run: |
-          pip install mypy black isort flake8
+          uv pip install ruff mypy
 
       - name: Run mypy
         run: mypy gqlrequests
 
-      - name: Run black
-        run: black --check gqlrequests
-
-      - name: Run isort
-        run: isort --check gqlrequests
-
-      - name: Run flake8
-        run: flake8 gqlrequests
+      - name: Run ruff
+        run: ruff check .
