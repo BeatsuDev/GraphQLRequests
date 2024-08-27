@@ -127,7 +127,7 @@ class QueryBuilder(abc.ABC):
             #   name
             # }
             elif self._resolved_fields[field] in self.SUPPORTED_TYPES or (
-                type(field_type) == enum.EnumType
+                type(field_type) == enum.EnumType  # type: ignore
             ):
                 fields_string_output += whitespaces + field + "\n"
 
