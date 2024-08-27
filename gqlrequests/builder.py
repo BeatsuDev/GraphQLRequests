@@ -6,6 +6,7 @@ from __future__ import annotations
 import abc
 import enum
 import typing
+from typing import Dict, List
 
 
 class QueryBuilder(abc.ABC):
@@ -34,18 +35,18 @@ class QueryBuilder(abc.ABC):
 
     SUPPORTED_TYPES = (int, float, str, bool)
 
-    _resolved_fields: dict[str, type | QueryBuilder] | None = None
+    _resolved_fields: Dict[str, type | QueryBuilder] | None = None
 
     indent_size: int = 4
     start_indents: int = 0
-    fields: list[str] | None = None
+    fields: List[str] | None = None
     func_name: str | None = None
 
     def __init__(self, **options):
         self._resolved_fields = typing.get_type_hints(self)
         self._process_options(options)
 
-    def _process_options(self, options: dict) -> None:
+    def _process_options(self, options: Dict[str, int | str | List[str]]) -> None:
         """Applies the given options to the builder state. This action
         overrides the current values of the builder."""
         if passed_fields := options.pop("fields", None):
@@ -83,7 +84,7 @@ class QueryBuilder(abc.ABC):
 
     def _generate_fields(self) -> str:
         # Guards
-        fields_to_generate: dict[str, type | QueryBuilder] = {}
+        fields_to_generate: Dict[str, type | QueryBuilder] = {}
 
         if not self._resolved_fields:
             raise ValueError("No fields were set for this builder.")
