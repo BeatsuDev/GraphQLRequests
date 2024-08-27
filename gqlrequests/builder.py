@@ -108,8 +108,8 @@ class QueryBuilder(abc.ABC):
             #    NestedType  # <---
             # }
             if type(field_type) in (type, abc.ABCMeta) and issubclass(
-                field_type, QueryBuilder
-            ):  # type: ignore
+                field_type, QueryBuilder # type: ignore
+            ):
                 FieldBuilder = field_type
                 field_builder = FieldBuilder(  # type: ignore
                     start_indents=len(whitespaces), indent_size=self.indent_size
