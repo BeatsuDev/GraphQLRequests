@@ -9,7 +9,6 @@ class EveryType(gqlrequests.QueryBuilder):
     name: str
     company: bool
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_method_with_no_args():
     correct_string = """
 methodName() {
@@ -19,11 +18,10 @@ methodName() {
     name
     company
 }
-"""
+"""[1:]
     every_type = EveryType(func_name="methodName")
     assert every_type().build() == correct_string
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_method_with_int_args():
     correct_string = """
 methodName(test: 5) {
@@ -33,7 +31,7 @@ methodName(test: 5) {
     name
     company
 }
-"""
+"""[1:]
     every_type = EveryType(func_name="methodName")
     assert every_type(test=5).build() == correct_string
 
@@ -47,8 +45,8 @@ specialName(test: 5) {
     name
     company
 }
-"""
-    specialName = EveryType()
+"""[1:]
+    specialName = EveryType(func_name="specialName")
     assert specialName(test=5).build() == correct_string
 
 @pytest.mark.skip(reason="Not implemented yet")
