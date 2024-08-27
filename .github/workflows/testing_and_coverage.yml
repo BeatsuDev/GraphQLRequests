@@ -45,15 +45,14 @@ jobs:
         with:
           python-version: 3.12
 
-      - uses: yezz123/setup-uv@v4
-
       - name: Install library dependencies
         run: |
-          uv pip install typing-inspect
+          python -m pip install --upgrade pip
+          pip install typing-inspect
 
       - name: Install testing and coverage dependencies
         run: |
-          uv pip install pytest pytest-cov
+          pip install pytest pytest-cov
 
       - name: Run pytest
         run: python -m pytest --cov=gqlrequests --cov-report=xml tests
