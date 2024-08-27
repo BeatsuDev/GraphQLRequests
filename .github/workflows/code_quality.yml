@@ -19,11 +19,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: yezz123/setup-uv@v4
-
       - name: Install code quality checking dependencies
         run: |
-          uv pip install ruff mypy
+          python -m pip install --upgrade pip
+          pip install ruff mypy
 
       - name: Run mypy
         run: mypy gqlrequests
