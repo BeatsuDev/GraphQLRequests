@@ -1,6 +1,7 @@
 import pytest
 import gqlrequests
 import enum
+from typing import List
 
 class EveryType(gqlrequests.QueryBuilder):
     id: int
@@ -106,8 +107,8 @@ def test_nested_types():
 
 class ListedType(gqlrequests.QueryBuilder):
     id: int
-    names: list[str]
-    types: list[EveryType]
+    names: List[str]
+    types: List[EveryType]
 
 
 @pytest.mark.skip(reason="Not implemented yet")
