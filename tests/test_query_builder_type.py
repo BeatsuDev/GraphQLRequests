@@ -9,7 +9,6 @@ class EveryType(gqlrequests.QueryBuilder):
     name: str
     company: bool
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_primitive_types():
     correct_string = """
 {
@@ -19,10 +18,9 @@ def test_primitive_types():
     name
     company
 }
-"""
+"""[1:]
     assert EveryType().build() == correct_string
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_indent():
     correct_string = """
 {
@@ -32,21 +30,19 @@ def test_indent():
   name
   company
 }
-"""
-    assert EveryType(indents=2).build() == correct_string
+"""[1:]
+    assert EveryType(indent_size=2).build() == correct_string
 
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_query_selection():
     correct_string = """
 {
     id
     age
 }
-"""
+"""[1:]
     assert EveryType(fields=["id", "age"]).build() == correct_string
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_start_indent():
     # Note that the first bracket is not indented. This is intentional because
     # it is meant to be used in as a field value in a query, where the first
@@ -59,15 +55,14 @@ def test_start_indent():
     name
     company
   }
-"""
-    assert EveryType(indents=2, start_indent=2).build() == correct_string
+"""[1:]
+    assert EveryType(indent_size=2, start_indents=2).build() == correct_string
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_selecting_no_fields_and_converting_to_string_raises_value_error():
     with pytest.raises(ValueError) as e:
         EveryType(fields=[]).build()
 
-    assert "no fields selected" in str(e.value).lower()
+    assert "no fields" in str(e.value).lower()
 
 
 class NestedType(gqlrequests.QueryBuilder):
@@ -76,7 +71,6 @@ class NestedType(gqlrequests.QueryBuilder):
     something: EveryType
 
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_nested_indent():
     correct_string = """
 {
@@ -90,10 +84,9 @@ def test_nested_indent():
     company
   }
 }
-"""
-    assert NestedType(indents=2).build() == correct_string
+"""[1:]
+    assert NestedType(indent_size=2).build() == correct_string
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_nested_types():
     correct_string = """
 {
@@ -107,7 +100,7 @@ def test_nested_types():
         company
     }
 }
-"""
+"""[1:]
     assert NestedType().build() == correct_string
 
 
@@ -180,11 +173,10 @@ class ClassWithEnumeratedFieldType(gqlrequests.QueryBuilder):
     enumerated: SomeEnumClass
 
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_enumerated_field_type():
     correct_string = """
 {
     enumerated
 }
-"""
+"""[1:]
     assert ClassWithEnumeratedFieldType().build() == correct_string
