@@ -17,11 +17,10 @@ def test_primtives_only_query_build():
     name
     company
 }
-""".lstrip()
+"""[1:]
     every_type = EveryType().build()
     assert str(every_type) == correct_string
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_setting_valid_property():
     correct_string = """
 {
@@ -30,13 +29,13 @@ def test_setting_valid_property():
     name
     company
 }
-"""
+"""[1:]
     every_type = EveryType(fields=[])  # No fields are selected
     every_type.id = int
     every_type.money = float
     every_type.name = str
     every_type.company = bool
-    assert str(every_type) == correct_string
+    assert every_type.build() == correct_string
 
 @pytest.mark.skip(reason="Not implemented yet")
 def test_setting_invalid_property():
