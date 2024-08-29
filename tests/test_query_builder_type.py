@@ -32,7 +32,7 @@ def test_indent():
   company
 }
 """[1:]
-    assert EveryType(indent_size=2).build() == correct_string
+    assert EveryType().build(indent_size=2) == correct_string
 
 
 def test_query_selection():
@@ -57,7 +57,7 @@ def test_start_indent():
     company
   }
 """[1:]
-    assert EveryType(indent_size=2, start_indents=2).build() == correct_string
+    assert EveryType().build(indent_size=2, start_indents=2) == correct_string
 
 def test_selecting_no_fields_and_converting_to_string_raises_value_error():
     with pytest.raises(ValueError) as e:
@@ -86,7 +86,7 @@ def test_nested_indent():
   }
 }
 """[1:]
-    assert NestedType(indent_size=2).build() == correct_string
+    assert NestedType().build(indent_size=2) == correct_string
 
 def test_nested_types():
     correct_string = """
