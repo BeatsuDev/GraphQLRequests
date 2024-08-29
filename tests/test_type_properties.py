@@ -31,6 +31,7 @@ def test_setting_valid_property():
 }
 """[1:]
     every_type = EveryType(fields=[])  # No fields are selected
+    print(every_type.build_fields)
     every_type.id = int
     every_type.money = float
     every_type.name = str
