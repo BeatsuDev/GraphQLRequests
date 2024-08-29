@@ -41,8 +41,6 @@ class QueryBuilder(abc.ABC):
     _resolved_fields: Dict[str, type | QueryBuilder] | None = None
     _build_function: bool = False
 
-    indent_size: int = 4
-    start_indents: int = 0
     build_fields: Dict[str, Any] | None = None
     func_name: str | None = None
     func_args: Dict[str, Any] | None = None
@@ -73,8 +71,6 @@ class QueryBuilder(abc.ABC):
                     )
 
         self.build_fields = { key: self._resolved_fields[key] for key in passed_fields }
-        self.indent_size = options.pop("indent_size", self.indent_size)
-        self.start_indents = options.pop("start_indents", self.start_indents)
         self.func_name = options.pop("func_name", self.func_name)
 
         if options:
@@ -83,23 +79,23 @@ class QueryBuilder(abc.ABC):
                 "QueryBuilder: " + ", ".join(options.keys())
             )
 
-    def build(self) -> str:
+    def build(self, indent_size: int = 4, start_indents: int = 0) -> str:
         """Generates a GraphQL query string based on the fields set in the
         builder."""
         if self.build_fields is None:
             raise ValueError("No fields were selected for the query builder. Cannot build an empty query.")
 
         if self._build_function:
-            return self._generate_function()
+            return self._generate_function(indent_size, start_indents)
 
         if len(self.build_fields.keys()) == 0:
             raise ValueError("No fields were selected for the query builder.")
         build_output = "{\n"
-        build_output += self._generate_fields()
-        build_output += " " * self.start_indents + "}\n"
+        build_output += self._generate_fields(indent_size, start_indents)
+        build_output += " " * start_indents + "}\n"
         return build_output
 
-    def _generate_fields(self) -> str:
+    def _generate_fields(self, indent_size: int = 4, start_indents: int = 0) -> str:
         # Guards
         fields_to_generate: Dict[str, type | QueryBuilder] = {}
 
@@ -119,7 +115,7 @@ class QueryBuilder(abc.ABC):
 
         # Actual generation
         fields_string_output = ""
-        whitespaces = " " * self.start_indents + " " * self.indent_size
+        whitespaces = " " * start_indents + " " * indent_size
 
         for field, field_type in fields_to_generate.items():
             # {
@@ -130,17 +126,14 @@ class QueryBuilder(abc.ABC):
                 field_type, QueryBuilder # type: ignore
             ):
                 FieldBuilder = field_type
-                field_builder = FieldBuilder(  # type: ignore
-                    start_indents=len(whitespaces), indent_size=self.indent_size
-                )
-                fields_string_output += whitespaces + f"{field} {field_builder.build()}"
+                field_builder = FieldBuilder()
+                fields_string_output += whitespaces + f"{field} {field_builder.build(indent_size, len(whitespaces))}"
 
             # query = EveryType()
             # query.something = NestedType(fields=["name"]) # <---
             elif type(field_type) != type and isinstance(field_type, QueryBuilder):
                 field_builder = field_type
-                field_builder.start_indents = len(whitespaces)
-                fields_string_output += whitespaces + f"{field} {field_builder.build()}"
+                fields_string_output += whitespaces + f"{field} {field_builder.build(indent_size, len(whitespaces))}"
 
             # {
             #   name
@@ -173,7 +166,7 @@ class QueryBuilder(abc.ABC):
 
         return self
 
-    def _generate_function(self) -> str:
+    def _generate_function(self, indent_size: int = 4, start_indents: int = 0) -> str:
         func_args = ""
         if self.func_args:
             func_args = ", ".join(
@@ -182,7 +175,7 @@ class QueryBuilder(abc.ABC):
 
         # Reset temporarily so that the next build call builds the rest of the query
         self._build_function = False
-        build_output = f"{self.func_name}({func_args}) {self.build()}"
+        build_output = f"{self.func_name}({func_args}) {self.build(indent_size, start_indents)}"
         self._build_function = True
 
         return build_output
