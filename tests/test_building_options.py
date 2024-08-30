@@ -145,7 +145,6 @@ class DatatypeWithKeywordAsProperty(gqlrequests.QueryBuilder):
     as_: int
 
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_keywords_as_field_name_gets_stripped_for_underscores():
     correct_string = """
 {
@@ -153,5 +152,5 @@ def test_keywords_as_field_name_gets_stripped_for_underscores():
     from
     as
 }
-"""
-    assert DatatypeWithKeywordAsProperty().build() == correct_string
+"""[1:]
+    assert DatatypeWithKeywordAsProperty().build(strip_undersores=True) == correct_string
