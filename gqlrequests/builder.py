@@ -128,15 +128,6 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
         else:
             raise ValueError(f"Cannot set {name} to {value}")
 
-
-        # TODO: Support setting attributes to classes - perhaps this should update the
-        #       resolved fields? It would allow for dynamic QueryBuilder creation.
-        if type(self) == type:
-            raise AttributeError("Cannot set attributes on a QueryBuilder class." \
-                                 "Please create an instance of the class first.")
-        if self.valid_field(name, value):
-            self._query_build_data.fields_to_build[name] = value
-
     def valid_field(self, name: str, value: type | QueryBuilder) -> bool:
         """Checks if the given field name and value is valid for this QueryBuilder.
         
