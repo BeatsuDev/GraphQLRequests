@@ -88,11 +88,14 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
     def get(self, name):
         return getattr(self._query_build_data, name)
 
-    def build(self, indent_size: int = 4, start_indents: int = 0) -> str:
+    def build(self, indent_size: int = 4, start_indents: int = 0, strip_undersores: bool = False) -> str:
         """Generates a GraphQL query string based on the fields set in the
         builder."""
         if not (fields_to_build := self.get("fields_to_build")):
             raise ValueError("No fields were selected for the query builder. Cannot build an empty query.")
+        
+        if strip_undersores:
+            fields_to_build = { key.strip("_"): value for key, value in fields_to_build.items() }
 
         if self.get("build_function"):
             if not (func_name := self.get("func_name")):
