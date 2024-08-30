@@ -25,7 +25,12 @@ class QueryBuilderMeta(type):
             old_fields = super().__getattribute__("_resolved_fields")
         except AttributeError:
             old_fields = {}
-        old_fields[name] = value
+
+        if value is None:
+            old_fields.pop(name, None)
+        else:
+            old_fields[name] = value
+
         super().__setattr__("_resolved_fields", old_fields)
 
 class QueryBuilder(metaclass=QueryBuilderMeta):
@@ -75,7 +80,7 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
 
     @classmethod
     def remove_field(cls, field_name: str) -> None:
-        delattr(cls, field_name)
+        cls._resolved_fields.pop(field_name, None)
 
     def set(self, name, value):
         setattr(self._query_build_data, name, value)
@@ -120,12 +125,9 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
         if self.__class__.__name__ == "QueryBuilder":
             raise AttributeError("Cannot set attributes on a QueryBuilder class." \
                                  "Make a class that inherits from QueryBuilder.")
-        
-        if value is None:
-            return self.remove_field(name)
 
         if inspect.isclass(self):
-            self.add_field(name, value)
+            pass  # This should be handled by the metaclass
 
         elif self.valid_field(name, value):
             self._query_build_data.fields_to_build[name] = value
