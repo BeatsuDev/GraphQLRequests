@@ -3,15 +3,32 @@ These are then use to build GraphQL query strings in a Pythonic way."""
 
 from __future__ import annotations
 
-import abc
 import inspect
 import typing
-from typing import Dict, List
+from types import SimpleNamespace
+from typing import List
 
 from gqlrequests.query_creator import generate_function_query_string, generate_query_string
 
 
-class QueryBuilder(abc.ABC):
+class QueryBuilderMeta(type):
+    def __new__(cls, name, bases, dct):
+        new_class = super().__new__(cls, name, bases, dct)
+        if not name == "QueryBuilder":
+            new_class._resolved_fields = typing.get_type_hints(new_class)
+        return new_class
+    
+    def __setattr__(cls, name, value):
+        if name == "_resolved_fields":
+            return super().__setattr__(name, value)
+        try:
+            old_fields = super().__getattribute__("_resolved_fields")
+        except AttributeError:
+            old_fields = {}
+        old_fields[name] = value
+        super().__setattr__("_resolved_fields", old_fields)
+
+class QueryBuilder(metaclass=QueryBuilderMeta):
     """An abstract class used to build GraphQL queries.
 
     This class should be inherited by a class with type hints and only
@@ -28,77 +45,99 @@ class QueryBuilder(abc.ABC):
             name: str
             company: bool
 
-        every_type = EveryType()
-        every_type.id = str
+        EveryType.add_field("address", str)
+        EveryType.remove_field("age")
 
+        every_type = EveryType(fields=["id", "money", "name", "company"])
         graphql_query_string = every_type.build()
 
     """
 
     SUPPORTED_TYPES = (int, float, str, bool)
 
-    # Resolved fields are the fields set in the class with type hints
-    # and remains unchanged. It is used to validate the fields property
-    _resolved_fields: Dict[str, type | QueryBuilder] | None = None
-    _build_function: bool = False
-
     def __init__(self, fields: List[str] | None = None, func_name: str | None = None) -> None:
-        self.build_fields: Dict[str, type | QueryBuilder] = {}
-        self._resolved_fields = typing.get_type_hints(self)
-        if not self._resolved_fields:
-            raise ValueError("A QueryBuilder must have type hints to build a query.")
-        
+        # Used to avoid calls to __setattr__ when setting attributes
+        self._query_build_data = SimpleNamespace()
+
+        # This will always be defined... Just need to help mypy out
+        self._resolved_fields = getattr(self, "_resolved_fields", {})
+
         if fields is None:
             fields = list(self._resolved_fields.keys())
         
-        self.func_name = func_name
-        self.build_fields = { key: self._resolved_fields[key] for key in fields }
+        self.set("fields_to_build", { key: self._resolved_fields[key] for key in fields })
+        self.set("func_name", func_name)
+        self.set("build_function", False)
+
+    @classmethod
+    def add_field(cls, field_name: str, field_type: type) -> None:
+        cls._resolved_fields[field_name] = field_type
+
+    @classmethod
+    def remove_field(cls, field_name: str) -> None:
+        delattr(cls, field_name)
+
+    def set(self, name, value):
+        setattr(self._query_build_data, name, value)
+
+    def get(self, name):
+        return getattr(self._query_build_data, name)
 
     def build(self, indent_size: int = 4, start_indents: int = 0) -> str:
         """Generates a GraphQL query string based on the fields set in the
         builder."""
-        if not self.build_fields:
+        if not (fields_to_build := self.get("fields_to_build")):
             raise ValueError("No fields were selected for the query builder. Cannot build an empty query.")
 
-        if self._build_function:
-            if not self.func_name:
+        if self.get("build_function"):
+            if not (func_name := self.get("func_name")):
                 raise ValueError(f"Cannot build function query for {__name__}. Function name is missing.")
-            return generate_function_query_string(self.func_name, self.func_args, self.build_fields, indent_size, start_indents)
-        return generate_query_string(self.build_fields, indent_size, start_indents)
+            return generate_function_query_string(func_name, self.get("func_args"), fields_to_build, indent_size, start_indents)
+        return generate_query_string(fields_to_build, indent_size, start_indents)
 
     def __call__(self, **args) -> QueryBuilder:
         """After calling this method, the builder will build a function."""
-        if not self.func_name:
+        if not self._query_build_data.func_name:
             raise ValueError("No function name was set for this builder.")
 
         # TODO: Add support for non-primitive arguments
         for key, value in args.items():
             if type(value) not in self.SUPPORTED_TYPES:
                 raise ValueError(
-                    f"Function argument {key} of {self.func_name} must be of" +
+                    f"Function argument {key} of {self.get('func_name')} must be of"
                     f"the following types: {self.SUPPORTED_TYPES}"
                 )
 
-        self.func_args = args
-        self._build_function = True
+        self.set("func_args", args)
+        self.set("build_function", True)
 
         return self
 
-    def __setattr__(self, name: str, value: type | QueryBuilder) -> None:
-        # All __setattr__ calls from within this class should be handled normally
-        if inspect.stack()[1].filename == __file__:
-            super().__setattr__(name, value)
-            return
+    def __setattr__(self, name: str, value: type | QueryBuilder | None) -> None:
+        if name in {"_query_build_data", "_resolved_fields"}:
+            return super().__setattr__(name, value)
+        
+        if value is None:
+            return self.remove_field(name)
+
+        if inspect.isclass(self):
+            self.add_field(name, value)
+
+        elif self.valid_field(name, value):
+            self._query_build_data.fields_to_build[name] = value
+        else:
+            raise ValueError(f"Cannot set {name} to {value}")
+
 
         # TODO: Support setting attributes to classes - perhaps this should update the
         #       resolved fields? It would allow for dynamic QueryBuilder creation.
         if type(self) == type:
             raise AttributeError("Cannot set attributes on a QueryBuilder class." \
                                  "Please create an instance of the class first.")
-        if self._valid_field(name, value):
-            self.build_fields[name] = value
+        if self.valid_field(name, value):
+            self._query_build_data.fields_to_build[name] = value
 
-    def _valid_field(self, name: str, value: type | QueryBuilder) -> bool:
+    def valid_field(self, name: str, value: type | QueryBuilder) -> bool:
         """Checks if the given field name and value is valid for this QueryBuilder.
         
         e.g.
@@ -109,9 +148,9 @@ class QueryBuilder(abc.ABC):
         human = Human(fields=[])
         infoObject = PersonalInfo(fields=["name"])
 
-        human._valid_field("info", infoObject)  # True
-        human._valid_field("info", PersonalInfo)  # True
-        human._valid_field("info", str)  # False
+        human.valid_field("info", infoObject)  # True
+        human.valid_field("info", PersonalInfo)  # True
+        human.valid_field("info", str)  # False
         """
         if type(self) == type:
             raise AttributeError("Cannot set attributes on a QueryBuilder class." \

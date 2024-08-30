@@ -31,7 +31,6 @@ def test_setting_valid_property():
 }
 """[1:]
     every_type = EveryType(fields=[])  # No fields are selected
-    print(every_type.build_fields)
     every_type.id = int
     every_type.money = float
     every_type.name = str
@@ -64,10 +63,9 @@ class NestedType(gqlrequests.QueryBuilder):
     age: int
     something: EveryType
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_setting_function_as_property():
     nested_type = NestedType(fields=[])
-    nested_type.something = EveryType(fields=["id"])(test=5)
+    nested_type.something = EveryType(fields=["id"], func_name="something")(test=5)
 
     correct_string = """
 {
@@ -75,5 +73,5 @@ def test_setting_function_as_property():
         id
     }
 }
-"""
-    assert str(nested_type) == correct_string
+"""[1:]
+    assert nested_type.build() == correct_string
