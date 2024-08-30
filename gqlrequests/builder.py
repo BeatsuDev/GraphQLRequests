@@ -130,7 +130,11 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
         elif self.valid_field(name, value):
             self._query_build_data.fields_to_build[name] = value
         else:
-            raise ValueError(f"Cannot set {name} to {value}")
+            try:
+                expected_type = self._resolved_fields[name]
+                raise AttributeError(f"Cannot set {name} to {value}. Expected {expected_type}.")
+            except KeyError:
+                raise AttributeError(f"{name} is not a valid field on {self.__class__.__name__}.")
 
     def valid_field(self, name: str, value: type | QueryBuilder) -> bool:
         """Checks if the given field name and value is valid for this QueryBuilder.
