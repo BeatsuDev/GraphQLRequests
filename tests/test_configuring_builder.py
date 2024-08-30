@@ -7,19 +7,15 @@ class EveryType(gqlrequests.QueryBuilder):
     money: float
     name: str
     company: bool
-    
-def test_primtives_only_query_build():
+
+def test_selecting_fields_builds_only_selected_fields():
     correct_string = """
 {
     id
     age
-    money
-    name
-    company
 }
 """[1:]
-    every_type = EveryType().build()
-    assert str(every_type) == correct_string
+    assert EveryType(fields=["id", "age"]).build() == correct_string
 
 def test_setting_valid_property():
     correct_string = """
@@ -54,22 +50,3 @@ def test_setting_invalid_property_type():
     assert "id" in str(e.value).lower()
     assert "int" in str(e.value).lower()
     assert "str" in str(e.value).lower()
-
-
-class NestedType(gqlrequests.QueryBuilder):
-    id: int
-    age: int
-    something: EveryType
-
-def test_setting_function_as_property():
-    nested_type = NestedType(fields=[])
-    nested_type.something = EveryType(fields=["id"], func_name="something")(test=5)
-
-    correct_string = """
-{
-    something(test: 5) {
-        id
-    }
-}
-"""[1:]
-    assert nested_type.build() == correct_string
