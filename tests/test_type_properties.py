@@ -37,7 +37,6 @@ def test_setting_valid_property():
     every_type.company = bool
     assert every_type.build() == correct_string
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_setting_invalid_property():
     every_type = EveryType(fields=[])  # No fields are selected
     
@@ -46,11 +45,10 @@ def test_setting_invalid_property():
     
     assert "invalid" in str(e.value).lower()
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_setting_invalid_property_type():
     every_type = EveryType(fields=[])  # No fields are selected
     
-    with pytest.raises(TypeError) as e:
+    with pytest.raises(AttributeError) as e:
         every_type.id = str
     
     assert "id" in str(e.value).lower()
