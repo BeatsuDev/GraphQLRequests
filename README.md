@@ -154,14 +154,16 @@ asyncio.run(main())
 ## Edge cases
 
 Some attributes are reserved keywords in Python, such as `from`, `is` and `not`. These cannot be referenced to
-by property like this: `some_query_result.from`. This can be circumvented by using the `StrippedUnderscoreQueryBuilder` like such;
+by property like this: `some_query_result.from`. This can be circumvented by adding leading or trailing underscores,
+then passing the `strip_underscores` argument to the build method.
+
 ```py
-class Time(gqlrequests.StrippedUnderscoreQueryBuilder):
+class Time(gqlrequests.QueryBuilder):
     _from: int
     _to: int
     value: float
 
-print(Time().build())
+print(Time().build(strip_underscores=True))
 # {
 #     from
 #     to
