@@ -117,6 +117,10 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
         if name in {"_query_build_data", "_resolved_fields"}:
             return super().__setattr__(name, value)
         
+        if self.__class__.__name__ == "QueryBuilder":
+            raise AttributeError("Cannot set attributes on a QueryBuilder class." \
+                                 "Make a class that inherits from QueryBuilder.")
+        
         if value is None:
             return self.remove_field(name)
 
