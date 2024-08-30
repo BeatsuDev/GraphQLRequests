@@ -1,6 +1,7 @@
 test.py
 *cache
 __pycache__
+.vscode
 
 # Coverage reports
 htmlcov
