@@ -18,7 +18,7 @@ setup(
     license="MIT",
     version=__version__,
     description="A Python library for making GraphQL requests easier!",
-    python_requires=">=3.7.0",
+    python_requires=">=3.8.0",
     author="BeatsuDev",
     author_email="",
     url="https://github.com/BeatsuDev/GraphQLRequests",
