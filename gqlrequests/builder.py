@@ -37,9 +37,7 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
     """An abstract class used to build GraphQL queries.
 
     This class should be inherited by a class with type hints and only
-    supports single-leveled inheritance. This version of the QueryBuilder
-    does not support reserved keywords as field names. To use reserved
-    keywords, check the `StrippedUnderscoresQueryBuilder` class.
+    supports single-leveled inheritance.
 
     Example usage:
 
