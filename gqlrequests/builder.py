@@ -129,8 +129,12 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
         if inspect.isclass(self):
             pass  # This should be handled by the metaclass
 
+        elif value is None:
+            self._query_build_data.fields_to_build.pop(name, None)
+
         elif self.valid_field(name, value):
             self._query_build_data.fields_to_build[name] = value
+
         else:
             try:
                 expected_type = self._resolved_fields[name]
