@@ -43,7 +43,7 @@ print(Character(fields=["name"]).build())
 #     name
 # }
 
-print(Character(indents=2).build()) # Default indent is 4
+print(Character().build(indents=2)) # Default indent is 4
 # {
 #   name
 #   appearsIn {
