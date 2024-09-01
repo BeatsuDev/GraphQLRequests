@@ -52,8 +52,7 @@ print(Character().build(indents=2)) # Default indent is 4
 #   }
 # }
 
-
-getCharacter = Character()  # Function name is variable name by default
+getCharacter = Character(func_name="getCharacter")
 print(getCharacter(name="Luke").build())
 # getCharacter(name: "Luke") {
 #     name
