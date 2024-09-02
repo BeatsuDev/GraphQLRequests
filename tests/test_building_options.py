@@ -119,6 +119,27 @@ def test_class_with_list_type_as_field_builds_correctly():
 """
     assert ListedType().build() == correct_string
 
+class NestedListedType(gqlrequests.QueryBuilder):
+    something: List[ListedType]
+
+def test_builder_with_nested_list_field_builds_correctly():
+    correct_string = """
+{
+    something {
+        id
+        names
+        types {
+            id
+            age
+            money
+            name
+            company
+        }
+    }
+}
+"""[1:]
+    assert NestedListedType().build() == correct_string
+
 class SomeEnumClass(enum.Enum):
     ONE = 1
     TWO = 2
