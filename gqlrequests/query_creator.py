@@ -57,10 +57,10 @@ def generate_fields(fields: Dict[str, type | gqlrequests.builder.QueryBuilder], 
             string_output += whitespaces + field + "\n"
         
         elif field_type_type == FieldTypeEnum.QUERY_BUILDER_CLASS:
-            string_output += whitespaces + field + " " + field_type().build(indent_size, len(whitespaces))
+            string_output += whitespaces + field + " " + field_type().build(indent_size, len(whitespaces))  # type: ignore
 
         elif field_type_type == FieldTypeEnum.QUERY_BUILDER_INSTANCE:
-            if field_type.get("build_function"):
+            if field_type.get("build_function"):  # type: ignore
                 string_output += whitespaces + field_type.build(indent_size, len(whitespaces))  # type: ignore
             else:
                 string_output += whitespaces + field + " " + field_type.build(indent_size, len(whitespaces))  # type: ignore
