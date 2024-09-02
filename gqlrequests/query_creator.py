@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 import inspect
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING, Dict, GenericAlias
 
 import gqlrequests
 
@@ -76,6 +76,10 @@ def resolve_type(type_hint: type | QueryBuilder) -> tuple[FieldTypeEnum, type]:
     if inspect.isclass(type_hint) and issubclass(type_hint, enum.Enum) or \
         not inspect.isclass(type_hint) and isinstance(type_hint, enum.Enum):
         return (FieldTypeEnum.ENUM, type_hint)
+    
+    # List
+    if not inspect.isclass(type_hint) and isinstance(type_hint, GenericAlias) and type_hint.__origin__ == list:
+        return resolve_type(type_hint.__args__[0])
     
     # QueryBuilder class
     if inspect.isclass(type_hint) and issubclass(type_hint, gqlrequests.builder.QueryBuilder):
