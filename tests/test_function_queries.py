@@ -103,7 +103,6 @@ class NestedType(gqlrequests.QueryBuilder):
     age: int
     something: EveryType
 
-@pytest.mark.xfail(reason="bug: nested types don't get generated")
 def test_nested_type_function():
     correct_string = """
 methodName() {
@@ -118,7 +117,7 @@ methodName() {
     }
 }
 """[1:]
-    every_type = EveryType(func_name="methodName")
+    every_type = NestedType(func_name="methodName")
     print(every_type().build())
     assert every_type().build() == correct_string
 
