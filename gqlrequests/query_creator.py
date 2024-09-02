@@ -2,9 +2,18 @@ from __future__ import annotations
 
 import enum
 import inspect
-from typing import Dict
+from typing import TYPE_CHECKING, Dict
 
 import gqlrequests
+
+if TYPE_CHECKING:
+    from gqlrequests.builder import QueryBuilder
+
+class FieldTypeEnum(enum.Enum):
+    PRIMITIVE = 1
+    ENUM = 2
+    QUERY_BUILDER_CLASS = 3
+    QUERY_BUILDER_INSTANCE = 4
 
 
 def generate_function_query_string(func_name: str, args: Dict[str, str | int | float | bool], fields: Dict[str, type | gqlrequests.builder.QueryBuilder], indent_size: int = 4, start_indents: int = 0) -> str:
@@ -35,25 +44,45 @@ def generate_fields(fields: Dict[str, type | gqlrequests.builder.QueryBuilder], 
     string_output = ""
     whitespaces = " " * start_indents + " " * indent_size
     
-    for field, field_type in fields.items():
-        is_primitive = inspect.isclass(field_type) and field_type in (int, float, str, bool)
-        is_enum = type(field_type) in (enum.Enum, enum.EnumMeta)
-        is_query_builder_class = inspect.isclass(field_type) and issubclass(field_type, gqlrequests.builder.QueryBuilder)
-        is_query_builder_instance = not inspect.isclass(field_type) and isinstance(field_type, gqlrequests.builder.QueryBuilder)
+    for field, field_type_hint in fields.items():
+        match resolve_type(field_type_hint):
+            case (FieldTypeEnum.PRIMITIVE, field_type):
+                string_output += whitespaces + field + "\n"
 
-        if is_primitive or is_enum:
-            string_output += whitespaces + field + "\n"
-        
-        elif is_query_builder_class:
-            string_output += whitespaces + field + " " + field_type().build(indent_size, len(whitespaces))
-        
-        elif is_query_builder_instance:
-            if field_type.get("build_function"):  # type: ignore
-                string_output += whitespaces + field_type.build(indent_size, len(whitespaces))  # type: ignore
-            else:
-                string_output += whitespaces + field + " " + field_type.build(indent_size, len(whitespaces))  # type: ignore
-        
-        else:
-            raise ValueError(f"Invalid field type: {field_type}")
+            case (FieldTypeEnum.ENUM, field_type):
+                string_output += whitespaces + field + "\n"
+
+            case (FieldTypeEnum.QUERY_BUILDER_CLASS, field_type):
+                string_output += whitespaces + field + " " + field_type().build(indent_size, len(whitespaces))
+
+            case (FieldTypeEnum.QUERY_BUILDER_INSTANCE, field_type):
+                if field_type.get("build_function"):
+                    string_output += whitespaces + field_type.build(indent_size, len(whitespaces))  # type: ignore
+                else:
+                    string_output += whitespaces + field + " " + field_type.build(indent_size, len(whitespaces))  # type: ignore
+            case _:
+                raise ValueError(f"Invalid field type: {field_type}")
 
     return string_output
+
+def resolve_type(type_hint: type | QueryBuilder) -> tuple[FieldTypeEnum, type]:
+    primitives = { int, float, str, bool }
+
+    # Primitive
+    if type_hint in primitives or type_hint in (enum.Enum, enum.EnumMeta):
+        return (FieldTypeEnum.PRIMITIVE, type_hint)
+    
+    # Enum
+    if inspect.isclass(type_hint) and issubclass(type_hint, enum.Enum) or \
+        not inspect.isclass(type_hint) and isinstance(type_hint, enum.Enum):
+        return (FieldTypeEnum.ENUM, type_hint)
+    
+    # QueryBuilder class
+    if inspect.isclass(type_hint) and issubclass(type_hint, gqlrequests.builder.QueryBuilder):
+        return (FieldTypeEnum.QUERY_BUILDER_CLASS, type_hint)
+    
+    # QueryBuilder instance
+    if not inspect.isclass(type_hint) and isinstance(type_hint, gqlrequests.builder.QueryBuilder):
+        return (FieldTypeEnum.QUERY_BUILDER_INSTANCE, type_hint)
+    
+    raise ValueError(f"Invalid field type: {type_hint}")
