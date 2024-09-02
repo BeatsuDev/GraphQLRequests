@@ -1,4 +1,6 @@
+import sys
 import enum
+import pytest
 import typing
 import gqlrequests
 from gqlrequests.query_creator import generate_fields, generate_query_string, generate_function_query_string
@@ -95,9 +97,18 @@ def test_resolve_type_query_builder_instance():
     instance = TestQueryBuilder()
     assert resolve_type(instance) == (FieldTypeEnum.QUERY_BUILDER_INSTANCE, instance)
 
-def test_resolve_list_field():
+
+@pytest.mark.skipif(sys.version_info < (3, 9), reason="Python 3.9 syntax")
+def test_resolve_list_field_python_39():
     class Test:
         age: list[list[list[int]]]
+    
+    hints = typing.get_type_hints(Test)
+    assert resolve_type(hints["age"]) == (FieldTypeEnum.PRIMITIVE, int)
+
+def test_resolve_list_field_python_38():
+    class Test:
+        age: typing.List[typing.List[typing.List[int]]]
     
     hints = typing.get_type_hints(Test)
     assert resolve_type(hints["age"]) == (FieldTypeEnum.PRIMITIVE, int)

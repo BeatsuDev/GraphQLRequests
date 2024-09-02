@@ -116,7 +116,7 @@ def test_class_with_list_type_as_field_builds_correctly():
         company
     }
 }
-"""
+"""[1:]
     assert ListedType().build() == correct_string
 
 class NestedListedType(gqlrequests.QueryBuilder):
