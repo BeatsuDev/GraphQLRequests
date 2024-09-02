@@ -51,23 +51,22 @@ def generate_fields(fields: Dict[str, type | gqlrequests.builder.QueryBuilder], 
     whitespaces = " " * start_indents + " " * indent_size
     
     for field, field_type_hint in fields.items():
-        match resolve_type(field_type_hint):
-            case (FieldTypeEnum.PRIMITIVE, field_type):
-                string_output += whitespaces + field + "\n"
+        field_type_type, field_type = resolve_type(field_type_hint)
 
-            case (FieldTypeEnum.ENUM, field_type):
-                string_output += whitespaces + field + "\n"
+        if field_type_type in {FieldTypeEnum.PRIMITIVE, FieldTypeEnum.ENUM}:
+            string_output += whitespaces + field + "\n"
+        
+        elif field_type_type == FieldTypeEnum.QUERY_BUILDER_CLASS:
+            string_output += whitespaces + field + " " + field_type().build(indent_size, len(whitespaces))
 
-            case (FieldTypeEnum.QUERY_BUILDER_CLASS, field_type):
-                string_output += whitespaces + field + " " + field_type().build(indent_size, len(whitespaces))
+        elif field_type_type == FieldTypeEnum.QUERY_BUILDER_INSTANCE:
+            if field_type.get("build_function"):
+                string_output += whitespaces + field_type.build(indent_size, len(whitespaces))  # type: ignore
+            else:
+                string_output += whitespaces + field + " " + field_type.build(indent_size, len(whitespaces))  # type: ignore
 
-            case (FieldTypeEnum.QUERY_BUILDER_INSTANCE, field_type):
-                if field_type.get("build_function"):
-                    string_output += whitespaces + field_type.build(indent_size, len(whitespaces))  # type: ignore
-                else:
-                    string_output += whitespaces + field + " " + field_type.build(indent_size, len(whitespaces))  # type: ignore
-            case _:
-                raise ValueError(f"Invalid field type: {field_type}")
+        else:
+            raise ValueError(f"Invalid field type: {field_type}")
 
     return string_output
 
