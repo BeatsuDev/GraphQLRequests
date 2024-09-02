@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import sys
 import enum
 import inspect
-from typing import TYPE_CHECKING, Dict
+import sys
+from typing import TYPE_CHECKING, Dict, _GenericAlias
 
-
-from typing import _GenericAlias
 if sys.version_info >= (3, 9):
     from typing import GenericAlias
 
