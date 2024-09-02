@@ -3,10 +3,10 @@ from __future__ import annotations
 import enum
 import inspect
 import sys
-from typing import TYPE_CHECKING, Dict, _GenericAlias
+from typing import TYPE_CHECKING, Dict, _GenericAlias  # type: ignore
 
 if sys.version_info >= (3, 9):
-    from typing import GenericAlias
+    from typing import GenericAlias  # type: ignore
 
 
 
@@ -71,7 +71,7 @@ def generate_fields(fields: Dict[str, type | gqlrequests.builder.QueryBuilder], 
 
     return string_output
 
-def resolve_type(type_hint: type | QueryBuilder) -> tuple[FieldTypeEnum, type]:
+def resolve_type(type_hint: type | enum.Enum | QueryBuilder) -> tuple[FieldTypeEnum, type | enum.Enum | QueryBuilder]:
     primitives = { int, float, str, bool }
 
     # Primitive
@@ -91,8 +91,8 @@ def resolve_type(type_hint: type | QueryBuilder) -> tuple[FieldTypeEnum, type]:
         else:
             is_generic_alias = isinstance(type_hint, _GenericAlias)
 
-        if is_generic_alias and type_hint.__origin__ == list:
-            return resolve_type(type_hint.__args__[0])
+        if is_generic_alias and type_hint.__origin__ == list:  # type: ignore
+            return resolve_type(type_hint.__args__[0])  # type: ignore
     
     # QueryBuilder class
     if inspect.isclass(type_hint) and issubclass(type_hint, gqlrequests.builder.QueryBuilder):
