@@ -82,17 +82,22 @@ def resolve_type(type_hint: type | enum.Enum | QueryBuilder) -> tuple[FieldTypeE
         not inspect.isclass(type_hint) and isinstance(type_hint, enum.Enum):
         return (FieldTypeEnum.ENUM, type_hint)
     
-    # List
-    if not inspect.isclass(type_hint):
-        is_generic_alias = False
-        if sys.version_info >= (3, 9):
-            is_generic_alias = isinstance(type_hint, GenericAlias) or isinstance(type_hint, _GenericAlias)
-        else:
-            is_generic_alias = isinstance(type_hint, _GenericAlias)
+    # list[] in python 3.8 is NOT a class, but an instance of _GenericAlias
+    # list[] in python 3.10 is the class AND an instance of GenericAlias (???? 
+    #   inspect.isclass(list[int]) and isinstance(list[int], GenericAlias) == True)
+    # list[] in python 3.12 is NOT a class, but an instance of GenericAlias...
+    is_generic_alias = False
+    if sys.version_info >= (3, 9):
+        is_generic_alias = isinstance(type_hint, GenericAlias) or isinstance(type_hint, _GenericAlias)
+    else:
+        is_generic_alias = isinstance(type_hint, _GenericAlias)
 
-        if is_generic_alias and type_hint.__origin__ == list:  # type: ignore
-            return resolve_type(type_hint.__args__[0])  # type: ignore
-    
+    is_generic_alias_list = is_generic_alias and type_hint.__origin__ == list  # type: ignore
+    is_just_list = inspect.isclass(type_hint) and type_hint == list
+
+    if is_generic_alias_list or is_just_list:
+        return resolve_type(type_hint.__args__[0])  # type: ignore
+
     # QueryBuilder class
     if inspect.isclass(type_hint) and issubclass(type_hint, gqlrequests.builder.QueryBuilder):
         return (FieldTypeEnum.QUERY_BUILDER_CLASS, type_hint)
