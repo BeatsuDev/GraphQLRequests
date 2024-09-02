@@ -103,7 +103,6 @@ class ListedType(gqlrequests.QueryBuilder):
     types: List[EveryType]
 
 
-@pytest.mark.skip(reason="Not implemented yet")
 def test_class_with_list_type_as_field_builds_correctly():
     correct_string = """
 {
