@@ -8,9 +8,7 @@ Define GraphQL types in Python as classes, then use them to automatically build 
 gqlrequests will automatically build the classes for you given the api endpoint by using introspection! (Now that's awesome).
 You no longer need to define your requests as multiline strings (hence no strings attached).
 
-**These examples show what I envision this module to become.**
-Examples of how it will work:
-
+## Examples of currently working features:
 ```py
 import gqlrequests
 
@@ -21,13 +19,6 @@ class Episode(gqlrequests.QueryBuilder):
 class Character(gqlrequests.QueryBuilder):
     name: str
     appearsIn: list[Episode]
-
-print(Character)
-# type Character {
-#     name: String
-#     appearsIn: [Episode]
-# }
-#
 
 print(Character().build())
 # {
@@ -77,8 +68,38 @@ print(characters_query.build())
 # }
 ```
 
-Interacting with a GraphQL endpoint (gql already does this, but this would be nicer imo):
+## Edge cases
 
+Some attributes are reserved keywords in Python, such as `from`, `is` and `not`. These cannot be referenced to
+by property like this: `some_query_result.from`. This can be circumvented by adding leading or trailing underscores,
+then passing the `strip_underscores` argument to the build method.
+
+```py
+class Time(gqlrequests.QueryBuilder):
+    _from: int
+    _to: int
+    value: float
+
+print(Time().build(strip_underscores=True))
+# {
+#     from
+#     to
+#     value
+# }
+```
+
+
+## Other features that are not yet implemented:
+```py
+print(Character)
+# type Character {
+#     name: String
+#     appearsIn: [Episode]
+# }
+#
+```
+
+Interacting with a GraphQL endpoint:
 ```py
 import gqlrequests
 import asyncio
@@ -148,24 +169,4 @@ async def main():
             if data.viewers < 10: break
 
 asyncio.run(main())
-```
-
-## Edge cases
-
-Some attributes are reserved keywords in Python, such as `from`, `is` and `not`. These cannot be referenced to
-by property like this: `some_query_result.from`. This can be circumvented by adding leading or trailing underscores,
-then passing the `strip_underscores` argument to the build method.
-
-```py
-class Time(gqlrequests.QueryBuilder):
-    _from: int
-    _to: int
-    value: float
-
-print(Time().build(strip_underscores=True))
-# {
-#     from
-#     to
-#     value
-# }
 ```
