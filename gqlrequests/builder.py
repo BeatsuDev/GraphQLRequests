@@ -43,7 +43,7 @@ class QueryBuilderMeta(type):
         output = f"type {cls.__name__} {{\n"
         for key, value in cls._resolved_fields.items():
             output += f"    {key}: {value.__name__}\n"
-        output += "}"
+        output += "}\n"
         return output
 
 class QueryBuilder(metaclass=QueryBuilderMeta):
