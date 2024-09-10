@@ -9,6 +9,7 @@ gqlrequests will automatically build the classes for you given the api endpoint 
 You no longer need to define your requests as multiline strings (hence no strings attached).
 
 ## Examples of currently working features:
+
 ```py
 import gqlrequests
 
@@ -88,8 +89,8 @@ print(Time().build(strip_underscores=True))
 # }
 ```
 
-
 ## Other features that are not yet implemented:
+
 ```py
 print(Character)
 # type Character {
@@ -100,6 +101,7 @@ print(Character)
 ```
 
 Interacting with a GraphQL endpoint:
+
 ```py
 import gqlrequests
 import asyncio
@@ -129,6 +131,7 @@ async def main():
         gqlclient.execute(RootQuery(fields=["episode"]).build())
     )
 
+    # Returns pydantic Models
     character, episode = await queries
 
     # Or simply:
