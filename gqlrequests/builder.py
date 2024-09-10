@@ -125,17 +125,8 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
     def __setattr__(self, name: str, value: type | QueryBuilder | None) -> None:
         if name in {"_query_build_data", "_resolved_fields"}:
             return super().__setattr__(name, value)
-        
-        if self.__class__.__name__ == "QueryBuilder":
-            raise AttributeError("Cannot set attributes on a QueryBuilder class." \
-                                 "Make a class that inherits from QueryBuilder.")
 
-        
-        if inspect.isclass(self):
-            # This should be handled by the metaclass, so pass all other cases
-            pass  # pragma: no cover
-
-        elif value is None:
+        if value is None:
             self._query_build_data.fields_to_build.pop(name, None)
 
         elif self.valid_field(name, value):
