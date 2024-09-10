@@ -66,7 +66,8 @@ def generate_fields(fields: Dict[str, type | gqlrequests.builder.QueryBuilder], 
                 string_output += whitespaces + field + " " + field_type.build(indent_size, len(whitespaces))  # type: ignore
 
         else:
-            raise ValueError(f"Invalid field type: {field_type}")
+            # This error should already be caught in the resolve_type function
+            raise ValueError(f"Invalid field type: {field_type}")  # pragma: no cover
 
     return string_output
 
