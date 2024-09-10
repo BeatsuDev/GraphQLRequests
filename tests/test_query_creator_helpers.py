@@ -7,6 +7,8 @@ from gqlrequests.query_creator import generate_fields, generate_query_string, ge
 from gqlrequests.query_creator import FieldTypeEnum, resolve_type
 
 
+# Generate fields functino
+
 def test_generate_fields():
     correct_string = """
     id
@@ -24,6 +26,8 @@ def test_generate_fields():
         "company": bool
     }
     assert generate_fields(fields) == correct_string
+
+# Generate query string function
 
 def test_generate_query_string():
     correct_string = """
@@ -44,6 +48,8 @@ def test_generate_query_string():
         "company": bool
     }
     assert generate_query_string(fields) == correct_string
+
+# Generate function query string function
 
 def test_generate_function_query_string():
     correct_string = """
@@ -72,6 +78,8 @@ getSomething(id: 1, number: 3.14, name: \"John\", isCool: true) {
 
     assert generate_function_query_string("getSomething", args, fields) == correct_string
 
+# Resolving types
+
 def test_resolve_type_primitive():
     assert resolve_type(int) == (FieldTypeEnum.PRIMITIVE, int)
     assert resolve_type(float) == (FieldTypeEnum.PRIMITIVE, float)
@@ -97,6 +105,7 @@ def test_resolve_type_query_builder_instance():
     instance = TestQueryBuilder()
     assert resolve_type(instance) == (FieldTypeEnum.QUERY_BUILDER_INSTANCE, instance)
 
+# Resolving list types
 
 @pytest.mark.skipif(sys.version_info < (3, 9), reason="Python 3.9 syntax")
 def test_resolve_list_field_python_39():
