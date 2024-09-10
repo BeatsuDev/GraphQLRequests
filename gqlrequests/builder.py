@@ -39,6 +39,13 @@ class QueryBuilderMeta(type):
 
         super().__setattr__("_resolved_fields", old_fields)
 
+    def __str__(cls):
+        output = f"type {cls.__name__} {{\n"
+        for key, value in cls._resolved_fields.items():
+            output += f"    {key}: {value.__name__}\n"
+        output += "}"
+        return output
+
 class QueryBuilder(metaclass=QueryBuilderMeta):
     """An abstract class used to build GraphQL queries.
 
