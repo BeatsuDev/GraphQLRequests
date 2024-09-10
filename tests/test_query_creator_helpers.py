@@ -27,6 +27,55 @@ def test_generate_fields():
     }
     assert generate_fields(fields) == correct_string
 
+class AgeType(gqlrequests.QueryBuilder):
+    age: int
+
+def test_generate_fields_with_nested_query_builder():
+    correct_string = """
+    something {
+        age
+    }
+"""[1:]
+
+    fields = {
+        "something": AgeType
+    }
+
+    assert generate_fields(fields) == correct_string
+
+def test_generate_fields_with_nested_query_builder_instance():
+    correct_string = """
+    something {
+        age
+    }
+"""[1:]
+
+    fields = {
+        "something": AgeType()
+    }
+
+    assert generate_fields(fields) == correct_string
+
+def test_generate_fields_with_nested_function():
+    correct_string = """
+    innerFunc() {
+        age
+    }
+"""[1:]
+
+    fields = {
+        "something": AgeType(func_name="innerFunc")()
+    }
+
+    assert generate_fields(fields) == correct_string
+
+class InvalidType:
+    pass
+
+def test_generate_fields_with_invalid_type_raises_error():
+    with pytest.raises(ValueError):
+        generate_fields({"invalid": InvalidType})
+
 # Generate query string function
 
 def test_generate_query_string():
