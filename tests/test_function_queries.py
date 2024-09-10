@@ -138,3 +138,8 @@ methodName() {
     nested_type = NestedType(func_name="methodName")
     nested_type.something = EveryType(func_name="something")(test=5)
     assert nested_type().build() == correct_string
+
+def test_building_function_with_no_func_name_raises_error():
+    with pytest.raises(ValueError):
+        every_type = EveryType()
+        every_type().build()
