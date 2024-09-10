@@ -158,8 +158,9 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
         human.valid_field("info", PersonalInfo)  # True
         human.valid_field("info", str)  # False
         """
-        if not self._resolved_fields:
-            return False
+        # This should never happen. Again it's just a failsafe
+        if not self._resolved_fields:  # pragma: no cover
+            return False  # pragma: no cover
 
         if name not in self._resolved_fields:
             return False
