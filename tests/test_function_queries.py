@@ -143,3 +143,8 @@ def test_building_function_with_no_func_name_raises_error():
     with pytest.raises(ValueError):
         every_type = EveryType()
         every_type().build()
+
+def test_calling_function_with_wrong_argument_type_raises_error():
+    every_type = EveryType(func_name="methodName")
+    with pytest.raises(ValueError):
+        every_type(test=str)

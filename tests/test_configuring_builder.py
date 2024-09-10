@@ -54,3 +54,13 @@ def test_setting_invalid_property_type():
 def test_setting_properties_on_query_builder_directly_raises_error():
     with pytest.raises(AttributeError):
         gqlrequests.QueryBuilder.test = str
+
+def test_setting_property_to_none_removes_it():
+    correct_string = """
+{
+    id
+}
+"""[1:]
+    every_type = EveryType(fields=["id", "company"])
+    every_type.company = None
+    assert every_type.build() == correct_string
