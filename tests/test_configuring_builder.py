@@ -50,3 +50,7 @@ def test_setting_invalid_property_type():
     assert "id" in str(e.value).lower()
     assert "int" in str(e.value).lower()
     assert "str" in str(e.value).lower()
+
+def test_setting_properties_on_query_builder_directly_raises_error():
+    with pytest.raises(AttributeError):
+        gqlrequests.QueryBuilder.test = str
