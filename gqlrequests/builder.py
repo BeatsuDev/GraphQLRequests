@@ -19,6 +19,10 @@ class QueryBuilderMeta(type):
         return new_class
     
     def __setattr__(cls, name, value):
+        if cls == QueryBuilder:
+            raise AttributeError("Cannot set attributes on a QueryBuilder class. " \
+                                 "Make a class that inherits from QueryBuilder.")
+
         if name == "_resolved_fields":
             return super().__setattr__(name, value)
         try:
