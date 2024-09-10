@@ -158,10 +158,6 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
         human.valid_field("info", PersonalInfo)  # True
         human.valid_field("info", str)  # False
         """
-        if type(self) == type:
-            raise AttributeError("Cannot set attributes on a QueryBuilder class." \
-                                 "Please create an instance of the class first.")
-        
         if not self._resolved_fields:
             return False
 
