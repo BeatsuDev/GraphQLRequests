@@ -13,7 +13,7 @@ if sys.version_info >= (3, 9):
 import gqlrequests
 
 if TYPE_CHECKING:
-    from gqlrequests.builder import QueryBuilder
+    from gqlrequests.builder import QueryBuilder  # pragma: no cover
 
 class FieldTypeEnum(enum.Enum):
     PRIMITIVE = 1
@@ -90,7 +90,7 @@ def resolve_type(type_hint: type | enum.Enum | QueryBuilder) -> tuple[FieldTypeE
     if sys.version_info >= (3, 9):
         is_generic_alias = isinstance(type_hint, GenericAlias) or isinstance(type_hint, _GenericAlias)
     else:
-        is_generic_alias = isinstance(type_hint, _GenericAlias)
+        is_generic_alias = isinstance(type_hint, _GenericAlias)  # pragma: no cover
 
     is_generic_alias_list = is_generic_alias and type_hint.__origin__ == list  # type: ignore
     is_just_list = inspect.isclass(type_hint) and type_hint == list
