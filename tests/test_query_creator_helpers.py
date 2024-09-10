@@ -49,6 +49,11 @@ def test_generate_query_string():
     }
     assert generate_query_string(fields) == correct_string
 
+def test_generate_query_string_with_no_fields_raises_error():
+    fields = {}
+    with pytest.raises(ValueError):
+        generate_query_string(fields)
+
 # Generate function query string function
 
 def test_generate_function_query_string():
