@@ -23,8 +23,10 @@ class QueryBuilderMeta(type):
             return super().__setattr__(name, value)
         try:
             old_fields = super().__getattribute__("_resolved_fields")
-        except AttributeError:
-            old_fields = {}
+
+        # This should not be possible, but is a failsafe measure
+        except AttributeError:  # pragma: no cover
+            old_fields = {}  # pragma: no cover
 
         if value is None:
             old_fields.pop(name, None)
@@ -97,7 +99,8 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
 
         if self.get("build_function"):
             if not (func_name := self.get("func_name")):
-                raise ValueError(f"Cannot build function query for {__name__}. Function name is missing.")
+                # This should be caught in __call__, so this is just a failsafe
+                raise ValueError(f"Cannot build function query for {__name__}. Function name is missing.")  # pragma: no cover
             return generate_function_query_string(func_name, self.get("func_args"), fields_to_build, indent_size, start_indents)
         return generate_query_string(fields_to_build, indent_size, start_indents)
 
@@ -127,8 +130,10 @@ class QueryBuilder(metaclass=QueryBuilderMeta):
             raise AttributeError("Cannot set attributes on a QueryBuilder class." \
                                  "Make a class that inherits from QueryBuilder.")
 
+        
         if inspect.isclass(self):
-            pass  # This should be handled by the metaclass
+            # This should be handled by the metaclass, so pass all other cases
+            pass  # pragma: no cover
 
         elif value is None:
             self._query_build_data.fields_to_build.pop(name, None)
