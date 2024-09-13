@@ -14,7 +14,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=["gqlrequests"],
     package_data={"gqlrequests": ["py.typed"]},
-    install_requires=[],
+    install_requires=["pydantic"],
     license="MIT",
     version=__version__,
     description="A Python library for making GraphQL requests easier!",
