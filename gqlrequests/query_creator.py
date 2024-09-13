@@ -5,15 +5,14 @@ import inspect
 import sys
 from typing import TYPE_CHECKING, Dict, Tuple, Type, _GenericAlias  # type: ignore
 
+import gqlrequests
+
 if sys.version_info >= (3, 9):
     from typing import GenericAlias  # type: ignore
 
-
-
-import gqlrequests
-
 if TYPE_CHECKING:
     from gqlrequests.builder import QueryBuilder  # pragma: no cover
+
 
 class FieldTypeEnum(enum.Enum):
     PRIMITIVE = 1
