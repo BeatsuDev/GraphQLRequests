@@ -25,7 +25,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install package dependencies
-        run: pip install pydantic
+        run: pip install pydantic pydantic-settings
 
       - name: Install testing dependencies
         run: pip install pytest
