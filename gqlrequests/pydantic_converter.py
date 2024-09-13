@@ -1,6 +1,7 @@
+from typing import Type
+
 from pydantic import BaseModel
 
-from typing import Type
 from .builder import QueryBuilder
 
 
