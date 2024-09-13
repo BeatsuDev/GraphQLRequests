@@ -3,7 +3,7 @@ from __future__ import annotations
 import enum
 import inspect
 import sys
-from typing import TYPE_CHECKING, Dict, Type, _GenericAlias  # type: ignore
+from typing import TYPE_CHECKING, Dict, Tuple, Type, _GenericAlias  # type: ignore
 
 if sys.version_info >= (3, 9):
     from typing import GenericAlias  # type: ignore
@@ -71,7 +71,7 @@ def generate_fields(fields: Dict[str, type | QueryBuilder | Type[QueryBuilder]],
 
     return string_output
 
-def resolve_type(type_hint: type | enum.Enum | QueryBuilder | Type[QueryBuilder]) -> tuple[FieldTypeEnum, type | enum.Enum | QueryBuilder | Type[QueryBuilder]]:
+def resolve_type(type_hint: type | enum.Enum | QueryBuilder | Type[QueryBuilder]) -> Tuple[FieldTypeEnum, type | enum.Enum | QueryBuilder | Type[QueryBuilder]]:
     primitives = { int, float, str, bool }
 
     # Primitive
