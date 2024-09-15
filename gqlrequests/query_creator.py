@@ -23,7 +23,7 @@ class FieldTypeEnum(enum.Enum):
     QUERY_BUILDER_INSTANCE = 4
     PYDANTIC_MODEL = 5
 
-Primitives = int | float | str | bool
+Primitives = Union[int, float, str, bool]
 # Pipe operator union does not support deferred string type evaluation apparently
 ValidFieldTypes = Union[Primitives, enum.EnumMeta, "QueryBuilder", Type["QueryBuilder"], Type[BaseModel], List["ValidFieldTypes"]]
 
