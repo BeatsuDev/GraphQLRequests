@@ -1,12 +1,15 @@
-# gqlrequests - Create requests to GraphQL APIs with no strings attached 😉
+# gqlrequests - Build GraphQL query-strings automagically
 
+### ✅ Create queries from pydantic models
+### ✅ Create queries from annotated classes
+### ✅ Dynamically select query fields
+
+______
 [![Pytests and Coverage](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/testing_and_coverage.yml/badge.svg)](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/testing_and_coverage.yml)
 [![Code Quality](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/code_quality.yml/badge.svg)](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/code_quality.yml)
 [![codecov](https://codecov.io/gh/BeatsuDev/GraphQLRequests/branch/main/graph/badge.svg?token=FBQKU5OEWT)](https://codecov.io/gh/BeatsuDev/GraphQLRequests)
 
-Define GraphQL types in Python as classes or pydantic classes, then use them to automatically build queries. Or even simpler;
-gqlrequests will automatically build the classes for you given the api endpoint by using introspection! (Now that's awesome).
-You no longer need to define your requests as multiline strings (hence no strings attached).
+A dynamic, pythonic way to build queries instead of using large multiline strings.
 
 ## Examples of currently working features:
 
@@ -109,3 +112,5 @@ print(Character)
 # }
 #
 ```
+
+### ✅ Query validation while developing in your IDE
