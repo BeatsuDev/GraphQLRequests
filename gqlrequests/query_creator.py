@@ -13,7 +13,7 @@ if sys.version_info >= (3, 9):
     from typing import GenericAlias  # type: ignore
 
 if TYPE_CHECKING:
-    from gqlrequests.builder import QueryBuilder
+    from gqlrequests.builder import QueryBuilder  # pragma: no cover
 
 
 class FieldTypeEnum(enum.Enum):
