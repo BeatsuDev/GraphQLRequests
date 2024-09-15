@@ -3,7 +3,7 @@ from __future__ import annotations
 import enum
 import inspect
 import sys
-from typing import TYPE_CHECKING, Dict, Tuple, Type, _GenericAlias  # type: ignore
+from typing import TYPE_CHECKING, List, Dict, Tuple, Type, _GenericAlias  # type: ignore
 
 import gqlrequests
 
@@ -20,8 +20,10 @@ class FieldTypeEnum(enum.Enum):
     QUERY_BUILDER_CLASS = 3
     QUERY_BUILDER_INSTANCE = 4
 
+Primitives = int | float | str | bool
+ValidFieldTypes = Primitives | enum.EnumType | QueryBuilder | Type[QueryBuilder] | List["ValidFieldTypes"]
 
-def generate_function_query_string(func_name: str, args: Dict[str, str | int | float | bool], fields: Dict[str, type | QueryBuilder | Type[QueryBuilder]], indent_size: int = 4, start_indents: int = 0) -> str:
+def generate_function_query_string(func_name: str, args: Dict[str, Primitives], fields: Dict[str, ValidFieldTypes], indent_size: int = 4, start_indents: int = 0) -> str:
     """Generates a GraphQL query string for a function with arguments."""
     query_string = func_name + "("
 
@@ -35,7 +37,7 @@ def generate_function_query_string(func_name: str, args: Dict[str, str | int | f
             processed_args.append(f"{key}: {value}")
     return query_string + ", ".join(processed_args) + ") " + generate_query_string(fields, indent_size, start_indents)
 
-def generate_query_string(fields: Dict[str, type | QueryBuilder | Type[QueryBuilder]], indent_size: int = 4, start_indents: int = 0) -> str:
+def generate_query_string(fields: Dict[str, ValidFieldTypes], indent_size: int = 4, start_indents: int = 0) -> str:
     """Generates a GraphQL query string based on the fields set in the builder."""
     if len(fields.keys()) == 0:
         raise ValueError("No fields were selected for the query builder.")
@@ -44,7 +46,7 @@ def generate_query_string(fields: Dict[str, type | QueryBuilder | Type[QueryBuil
     build_output += " " * start_indents + "}\n"
     return build_output
 
-def generate_fields(fields: Dict[str, type | QueryBuilder | Type[QueryBuilder]], indent_size: int = 4, start_indents: int = 0) -> str:
+def generate_fields(fields: Dict[str, ValidFieldTypes], indent_size: int = 4, start_indents: int = 0) -> str:
     """Generates a string of the fields of a GraphQL query."""
     string_output = ""
     whitespaces = " " * start_indents + " " * indent_size
@@ -70,7 +72,7 @@ def generate_fields(fields: Dict[str, type | QueryBuilder | Type[QueryBuilder]],
 
     return string_output
 
-def resolve_type(type_hint: type | enum.Enum | QueryBuilder | Type[QueryBuilder]) -> Tuple[FieldTypeEnum, type | enum.Enum | QueryBuilder | Type[QueryBuilder]]:
+def resolve_type(type_hint: ValidFieldTypes) -> Tuple[FieldTypeEnum, ValidFieldTypes]:
     primitives = { int, float, str, bool }
 
     # Primitive
@@ -92,8 +94,8 @@ def resolve_type(type_hint: type | enum.Enum | QueryBuilder | Type[QueryBuilder]
     else:
         is_generic_alias = isinstance(type_hint, _GenericAlias)  # pragma: no cover
 
-    is_generic_alias_list = is_generic_alias and type_hint.__origin__ == list  # type: ignore
-    is_just_list = inspect.isclass(type_hint) and type_hint == list
+    is_generic_alias_list = bool(is_generic_alias and type_hint.__origin__ == list)  # type: ignore
+    is_just_list = bool(inspect.isclass(type_hint) and type_hint == list)
 
     if is_generic_alias_list or is_just_list:
         return resolve_type(type_hint.__args__[0])  # type: ignore
