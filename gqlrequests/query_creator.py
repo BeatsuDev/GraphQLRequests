@@ -25,7 +25,7 @@ class FieldTypeEnum(enum.Enum):
 
 Primitives = int | float | str | bool
 # Pipe operator union does not support deferred string type evaluation apparently
-ValidFieldTypes = Union[Primitives, enum.EnumType, "QueryBuilder", Type["QueryBuilder"], Type[BaseModel], List["ValidFieldTypes"]]
+ValidFieldTypes = Union[Primitives, enum.EnumMeta, "QueryBuilder", Type["QueryBuilder"], Type[BaseModel], List["ValidFieldTypes"]]
 
 def generate_function_query_string(func_name: str, args: Dict[str, Primitives], fields: Dict[str, ValidFieldTypes], indent_size: int = 4, start_indents: int = 0) -> str:
     """Generates a GraphQL query string for a function with arguments."""
