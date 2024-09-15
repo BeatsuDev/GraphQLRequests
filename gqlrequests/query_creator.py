@@ -3,7 +3,7 @@ from __future__ import annotations
 import enum
 import inspect
 import sys
-from typing import Dict, List, Tuple, Type, _GenericAlias  # type: ignore
+from typing import TYPE_CHECKING, Dict, List, Tuple, Type, Union, _GenericAlias  # type: ignore
 
 from pydantic import BaseModel
 
@@ -11,6 +11,9 @@ import gqlrequests
 
 if sys.version_info >= (3, 9):
     from typing import GenericAlias  # type: ignore
+
+if TYPE_CHECKING:
+    from gqlrequests.builder import QueryBuilder
 
 
 class FieldTypeEnum(enum.Enum):
@@ -21,7 +24,8 @@ class FieldTypeEnum(enum.Enum):
     PYDANTIC_MODEL = 5
 
 Primitives = int | float | str | bool
-ValidFieldTypes = Primitives | enum.EnumType | gqlrequests.builder.QueryBuilder | Type[gqlrequests.builder.QueryBuilder] | Type[BaseModel] | List["ValidFieldTypes"]
+# Pipe operator union does not support deferred string type evaluation apparently
+ValidFieldTypes = Union[Primitives, enum.EnumType, "QueryBuilder", Type["QueryBuilder"], Type[BaseModel], List["ValidFieldTypes"]]
 
 def generate_function_query_string(func_name: str, args: Dict[str, Primitives], fields: Dict[str, ValidFieldTypes], indent_size: int = 4, start_indents: int = 0) -> str:
     """Generates a GraphQL query string for a function with arguments."""
