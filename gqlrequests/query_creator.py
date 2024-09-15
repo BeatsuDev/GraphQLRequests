@@ -3,7 +3,9 @@ from __future__ import annotations
 import enum
 import inspect
 import sys
-from typing import TYPE_CHECKING, List, Dict, Tuple, Type, _GenericAlias  # type: ignore
+from typing import TYPE_CHECKING, Dict, List, Tuple, Type, Union, _GenericAlias  # type: ignore
+
+from pydantic import BaseModel
 
 import gqlrequests
 
@@ -11,7 +13,7 @@ if sys.version_info >= (3, 9):
     from typing import GenericAlias  # type: ignore
 
 if TYPE_CHECKING:
-    from gqlrequests.builder import QueryBuilder  # pragma: no cover
+    from gqlrequests.builder import QueryBuilder
 
 
 class FieldTypeEnum(enum.Enum):
@@ -19,9 +21,11 @@ class FieldTypeEnum(enum.Enum):
     ENUM = 2
     QUERY_BUILDER_CLASS = 3
     QUERY_BUILDER_INSTANCE = 4
+    PYDANTIC_MODEL = 5
 
-Primitives = int | float | str | bool
-ValidFieldTypes = Primitives | enum.EnumType | QueryBuilder | Type[QueryBuilder] | List["ValidFieldTypes"]
+Primitives = Union[int, float, str, bool]
+# Pipe operator union does not support deferred string type evaluation apparently
+ValidFieldTypes = Union[Primitives, enum.EnumMeta, "QueryBuilder", Type["QueryBuilder"], Type[BaseModel], List["ValidFieldTypes"]]
 
 def generate_function_query_string(func_name: str, args: Dict[str, Primitives], fields: Dict[str, ValidFieldTypes], indent_size: int = 4, start_indents: int = 0) -> str:
     """Generates a GraphQL query string for a function with arguments."""
@@ -66,6 +70,9 @@ def generate_fields(fields: Dict[str, ValidFieldTypes], indent_size: int = 4, st
             else:
                 string_output += whitespaces + field + " " + field_type.build(indent_size, len(whitespaces))  # type: ignore
 
+        elif field_type_type == FieldTypeEnum.PYDANTIC_MODEL:
+            string_output += whitespaces + field + " " + generate_query_string(field_type.__annotations__, indent_size, len(whitespaces))
+
         else:
             # This error should already be caught in the resolve_type function
             raise ValueError(f"Invalid field type: {field_type}")  # pragma: no cover
@@ -107,5 +114,9 @@ def resolve_type(type_hint: ValidFieldTypes) -> Tuple[FieldTypeEnum, ValidFieldT
     # QueryBuilder instance
     if not inspect.isclass(type_hint) and isinstance(type_hint, gqlrequests.builder.QueryBuilder):
         return (FieldTypeEnum.QUERY_BUILDER_INSTANCE, type_hint)
+    
+    # BaseModel
+    if inspect.isclass(type_hint) and issubclass(type_hint, BaseModel):
+        return (FieldTypeEnum.PYDANTIC_MODEL, type_hint)
     
     raise ValueError(f"Invalid field type: {type_hint}")
