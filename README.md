@@ -4,7 +4,7 @@
 [![Code Quality](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/code_quality.yml/badge.svg)](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/code_quality.yml)
 [![codecov](https://codecov.io/gh/BeatsuDev/GraphQLRequests/branch/main/graph/badge.svg?token=FBQKU5OEWT)](https://codecov.io/gh/BeatsuDev/GraphQLRequests)
 
-Define GraphQL types in Python as classes, then use them to automatically build queries. Or even simpler;
+Define GraphQL types in Python as classes or pydantic classes, then use them to automatically build queries. Or even simpler;
 gqlrequests will automatically build the classes for you given the api endpoint by using introspection! (Now that's awesome).
 You no longer need to define your requests as multiline strings (hence no strings attached).
 
@@ -67,6 +67,16 @@ print(characters_query.build())
 #         length
 #     }
 # }
+
+from pydantic import BaseModel
+
+class ExampleModel(BaseModel):
+    age: int
+    name: str
+
+ExampleQueryBuilder = gqlrequests.from_pydantic(ExampleModel)
+
+print(ExampleQueryBuilder().build())
 ```
 
 ## Edge cases
