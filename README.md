@@ -11,7 +11,50 @@ ______
 
 A dynamic, pythonic way to build queries instead of using large multiline strings.
 
-## Examples of currently working features:
+```py
+import gqlrequests
+
+# Define the type
+class Example(gqlrequests.QueryBuilder):
+    age: int
+    name: str
+
+# Or with pydantic
+class ExampleModel(BaseModel):
+    age: int
+    name: str
+
+Example = gqlrequests.from_pydantic(ExampleModel)
+
+# Dynamically add or remove fields to the type
+Example.friends = list[Example]
+Example.age = None  # (This removes the field)
+
+# Create a builder instance:
+example_builder = Example()
+
+# Dynamically select fields and set function name for when it's used to create a function query
+search = Example(fields=["name"], func_name="search")
+
+# Create a function query with arguments
+search_query = search(name="Anna")
+
+# Dynamically add or remove fields to be built
+search.name = None  # Doesn't build the name field after all
+search.friends = search(name="Anna")
+
+# Build the query string
+search.build(indents=2)
+```
+```
+{
+  search(name="Anna") {
+    name
+  }
+}
+```
+
+## More examples
 
 ```py
 import gqlrequests
