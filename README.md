@@ -5,6 +5,11 @@
 ### ✅ Dynamically select query fields
 
 ______
+
+> Note: Development on this module will be dropped, because [`gql`'s DSL module](https://gql.readthedocs.io/en/stable/advanced/dsl_module.html) solves exactly what this module is supposed to solve.
+> This was a fun learning experience, but for production environments, [`gql`'s DSL module](https://gql.readthedocs.io/en/stable/advanced/dsl_module.html) should be used instead.
+> [Ariadne's code generation tool](https://github.com/mirumee/ariadne-codegen) can be uesd to generate pydantic classes from a graphql endpoint. 
+
 [![Pytests and Coverage](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/testing_and_coverage.yml/badge.svg)](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/testing_and_coverage.yml)
 [![Code Quality](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/code_quality.yml/badge.svg)](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/code_quality.yml)
 [![codecov](https://codecov.io/gh/BeatsuDev/GraphQLRequests/branch/main/graph/badge.svg?token=FBQKU5OEWT)](https://codecov.io/gh/BeatsuDev/GraphQLRequests)
