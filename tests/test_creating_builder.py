@@ -85,3 +85,37 @@ class InvalidType(gqlrequests.QueryBuilder):
 def test_invalid_type_throws_value_error():
     with pytest.raises(ValueError) as e:
         InvalidType().build()
+
+        
+def test_string_representation_of_class_shows_graphql_syntax():
+    class EveryType(gqlrequests.QueryBuilder):
+        id: int
+        age: int
+        money: float
+        name: str
+        company: bool
+
+    correct_string = """
+type EveryType {
+    id: int
+    age: int
+    money: float
+    name: str
+    company: bool
+}
+"""[1:]
+    assert str(EveryType) == correct_string
+
+def test_string_representation_of_nested_class_shows_graphql_syntax():
+    correct_string = """
+type NestedType {
+    something: SomethingType
+}
+"""[1:]
+    class SomethingType(gqlrequests.QueryBuilder):
+        id: int
+
+    class NestedType(gqlrequests.QueryBuilder):
+        something: SomethingType
+    
+    assert str(NestedType) == correct_string
