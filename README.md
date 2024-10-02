@@ -6,9 +6,12 @@
 
 ______
 
-> Note: Development on this module will be dropped, because [`gql`'s DSL module](https://gql.readthedocs.io/en/stable/advanced/dsl_module.html) solves exactly what this module is supposed to solve.
-> This was a fun learning experience, but for production environments, [`gql`'s DSL module](https://gql.readthedocs.io/en/stable/advanced/dsl_module.html) should be used instead.
-> [Ariadne's code generation tool](https://github.com/mirumee/ariadne-codegen) can be uesd to generate pydantic classes from a graphql endpoint. 
+> Note: [`gql`'s DSL module](https://gql.readthedocs.io/en/stable/advanced/dsl_module.html) solves exactly what this module is supposed to solve, but is more mature
+> and has a larger developer base backing the development of it. `gqlrequests` is still in experimental phases and often undergoes large breaking changes, so if you use
+> this, I highly recommend pinning this package dependency to its exact version and manually update it if needed. For a more stable dynamic query composer, use
+> [`gql`'s DSL module](https://gql.readthedocs.io/en/stable/advanced/dsl_module.html).
+> 
+> [Ariadne's code generation tool](https://github.com/mirumee/ariadne-codegen) can also be used to generate pydantic classes from a graphql endpoint. 
 
 [![Pytests and Coverage](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/testing_and_coverage.yml/badge.svg)](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/testing_and_coverage.yml)
 [![Code Quality](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/code_quality.yml/badge.svg)](https://github.com/BeatsuDev/GraphQLRequests/actions/workflows/code_quality.yml)
